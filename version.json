@@ -1,6 +1,6 @@
 {
-  "versionCode": 13,
-  "versionName": "0.8.5",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.8.5/naya.apk",
-  "releaseNotes": "홈 규칙 디자인 설정 UI (0.8.4 기준)"
+  "versionCode": 14,
+  "versionName": "0.8.6",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.8.6/naya.apk",
+  "releaseNotes": "디자인 스타일·프레임·글꼴 전체 표시, 하단 탭 유지, 뒤로가기 이전화면"
 }
