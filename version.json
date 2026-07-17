@@ -1,1 +1,6 @@
-{"versionCode":21,"versionName":"0.9.3","apkUrl":"https://github.com/justin7497/naya-releases/releases/download/v0.9.3/naya.apk","releaseNotes":"Add automatic update prompts, source-app opening, per-rule sound and urgency, custom watched apps, and refreshed guide image"}
+{
+  "versionCode": 22,
+  "versionName": "0.9.4",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.4/naya.apk",
+  "releaseNotes": "Fix recent-notification and installed-app layouts; show update prompt on app start"
+}
