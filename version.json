@@ -1,6 +1,6 @@
 {
-  "versionCode": 23,
-  "versionName": "0.9.5",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.5/naya.apk",
-  "releaseNotes": "Add home hero slide 3 (pain points / VIP mode banner)"
+  "versionCode": 25,
+  "versionName": "0.9.7",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.7/naya.apk",
+  "releaseNotes": "Improve opening the original notification app, including lock-screen and background cases"
 }
