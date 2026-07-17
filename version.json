@@ -1,6 +1,6 @@
 {
-  "versionCode": 22,
-  "versionName": "0.9.4",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.4/naya.apk",
-  "releaseNotes": "Fix recent-notification and installed-app layouts; show update prompt on app start"
+  "versionCode": 23,
+  "versionName": "0.9.5",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.5/naya.apk",
+  "releaseNotes": "Add home hero slide 3 (pain points / VIP mode banner)"
 }
