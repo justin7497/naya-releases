@@ -1,6 +1,6 @@
 {
-  "versionCode": 28,
-  "versionName": "0.9.10",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.10/naya.apk",
-  "releaseNotes": "Add theme sets: Classic Siren and Laser Slit Scan alert themes"
+  "versionCode": 29,
+  "versionName": "0.9.11",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.11/naya.apk",
+  "releaseNotes": "Design tab: theme picker first, detail settings on next page"
 }
