@@ -1,6 +1,6 @@
 {
-  "versionCode": 29,
-  "versionName": "0.9.11",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.11/naya.apk",
-  "releaseNotes": "Design tab: theme picker first, detail settings on next page"
+  "versionCode": 30,
+  "versionName": "0.9.12",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.12/naya.apk",
+  "releaseNotes": "Fix layout clipping: global border-box sizing, design screens rearranged for phone screens"
 }
