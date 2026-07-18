@@ -1,6 +1,6 @@
 {
-  "versionCode": 31,
-  "versionName": "0.9.13",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.13/naya.apk",
-  "releaseNotes": "Refine theme details for phones and add responsive UI safeguards"
+  "versionCode": 32,
+  "versionName": "0.9.14",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.14/naya.apk",
+  "releaseNotes": "Upgrade laser scan alert with triple bloom, scan trail, and burst reveal"
 }
