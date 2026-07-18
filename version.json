@@ -1,6 +1,6 @@
 {
-  "versionCode": 25,
-  "versionName": "0.9.7",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.7/naya.apk",
-  "releaseNotes": "Improve opening the original notification app, including lock-screen and background cases"
+  "versionCode": 26,
+  "versionName": "0.9.8",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.8/naya.apk",
+  "releaseNotes": "Fix lock-screen popup not appearing (keyguard was dismissed too early)"
 }
