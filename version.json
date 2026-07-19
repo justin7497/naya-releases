@@ -1,6 +1,6 @@
 {
-  "versionCode": 34,
-  "versionName": "0.9.16",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.16/naya.apk",
-  "releaseNotes": "Alerts now show as a centered card over a dimmed background instead of full screen"
+  "versionCode": 35,
+  "versionName": "0.9.17",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.17/naya.apk",
+  "releaseNotes": "Fix broken UI text caused by a corrupted encoding in 0.9.16"
 }
