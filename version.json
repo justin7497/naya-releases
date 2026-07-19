@@ -1,6 +1,6 @@
 {
-  "versionCode": 32,
-  "versionName": "0.9.14",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.14/naya.apk",
-  "releaseNotes": "Upgrade laser scan alert with triple bloom, scan trail, and burst reveal"
+  "versionCode": 33,
+  "versionName": "0.9.15",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.15/naya.apk",
+  "releaseNotes": "Add per-target profile photos shown on classic and laser alerts"
 }
