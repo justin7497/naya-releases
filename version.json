@@ -1,6 +1,6 @@
 {
-  "versionCode": 33,
-  "versionName": "0.9.15",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.15/naya.apk",
-  "releaseNotes": "Add per-target profile photos shown on classic and laser alerts"
+  "versionCode": 34,
+  "versionName": "0.9.16",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.16/naya.apk",
+  "releaseNotes": "Alerts now show as a centered card over a dimmed background instead of full screen"
 }
