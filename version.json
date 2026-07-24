@@ -1,6 +1,6 @@
 {
-  "versionCode": 37,
-  "versionName": "0.9.19",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.19/naya.apk",
-  "releaseNotes": "Sideload: Heartbeat Pulse theme (edge ring pulse + rose card)"
+  "versionCode": 38,
+  "versionName": "0.9.20",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.20/naya.apk",
+  "releaseNotes": "Fix: clarify alert status vs update on About screen"
 }
