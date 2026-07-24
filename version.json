@@ -1,6 +1,6 @@
 {
-  "versionCode": 35,
-  "versionName": "0.9.17",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.17/naya.apk",
-  "releaseNotes": "Fix broken UI text caused by a corrupted encoding in 0.9.16"
+  "versionCode": 37,
+  "versionName": "0.9.19",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.19/naya.apk",
+  "releaseNotes": "Sideload: Heartbeat Pulse theme (edge ring pulse + rose card)"
 }
