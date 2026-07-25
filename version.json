@@ -1,6 +1,6 @@
 {
-  "versionCode": 38,
-  "versionName": "0.9.20",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.20/naya.apk",
-  "releaseNotes": "Fix: clarify alert status vs update on About screen"
+  "versionCode": 39,
+  "versionName": "0.9.21",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.21/naya.apk",
+  "releaseNotes": "Lock screen popup: overlay-first on all builds; Play activity fallback"
 }
