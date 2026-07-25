@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#3b82f6" />
+  <title>나야 (NaYa)</title>
+  <link rel="stylesheet" href="app.css?v=0920" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar" id="topbar">
+      <div class="topbar-brand">
+        <img src="img/naya-logo.png" alt="" class="brand-logo" />
+        <span class="brand-wordmark">
+          <b>Na<span>Ya</span></b>
+          <small>나야 · 중요한 알림만</small>
+        </span>
+      </div>
+      <button type="button" class="topbar-status is-off" id="topbarStatus" data-action="statusTap" aria-label="나야 작동 상태">
+        <span class="topbar-status-dot"></span>
+        <span class="topbar-status-label" id="topbarStatusLabel">OFF</span>
+      </button>
+    </header>
+
+    <div class="stage">
+      <!-- ===== 탭 허브 (한 화면, 스크롤 없음) ===== -->
+      <main class="pages" id="tabPages">
+        <!-- 홈 -->
+        <section class="page hub is-active" id="page-home" data-page="home">
+          <div class="home-hero" id="homeHero">
+            <div class="home-hero-track" id="homeHeroTrack">
+              <div class="home-hero-slide">
+                <img src="img/home-hero.png" alt="진짜 중요한 연락은, 깨워줄게, 나야! 지정한 알림만 끈질기게 증폭 알림" />
+              </div>
+              <div class="home-hero-slide">
+                <img src="img/home-hero-guide.png?v=guide3" alt="NaYa 앱 사용 설명서 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시, 잠금화면 즉시 확인" />
+              </div>
+              <div class="home-hero-slide">
+                <img src="img/home-hero-painpoints.png?v=3" alt="중요 알림을 절대 놓치지 마세요 — 정보 홍수·데드라인 놓침을 NaYa로 해결" />
+              </div>
+            </div>
+            <div class="home-hero-dots" id="homeHeroDots" aria-hidden="true">
+              <button type="button" class="home-hero-dot is-active" data-hero-idx="0" aria-label="1번 배너"></button>
+              <button type="button" class="home-hero-dot" data-hero-idx="1" aria-label="2번 배너"></button>
+              <button type="button" class="home-hero-dot" data-hero-idx="2" aria-label="3번 배너"></button>
+            </div>
+          </div>
+
+          <div class="hub-grid">
+            <button type="button" class="hub-tile" data-sub="setup" id="tileSetup">
+              <img class="hub-img" src="img/naya-icon-setup.png" alt="" />
+              <span class="hub-label">시작하기</span>
+              <span class="hub-sub">권한·연결 설정</span>
+            </button>
+            <button type="button" class="hub-tile" data-goto="rules">
+              <img class="hub-img" src="img/naya-icon-rules.png" alt="" />
+              <span class="hub-label">감시 규칙</span>
+              <span class="hub-sub">대상·앱·키워드</span>
+            </button>
+            <button type="button" class="hub-tile" data-goto="design">
+              <img class="hub-img" src="img/naya-icon-design.png" alt="" />
+              <span class="hub-label">디자인&사운드</span>
+              <span class="hub-sub">팝업·효과음·음성</span>
+            </button>
+            <button type="button" class="hub-tile accent" data-action="testCritical">
+              <img class="hub-img" src="img/naya-icon-test.png" alt="" />
+              <span class="hub-label">테스트</span>
+              <span class="hub-sub">긴급 알림 미리보기</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 규칙 허브 -->
+        <section class="page hub" id="page-rules" data-page="rules">
+          <p class="hub-lead">누구·어떤 앱·어떤 단어를 감시할지 정합니다.</p>
+          <nav class="menu-list">
+            <button type="button" class="menu-item" data-sub="recent">
+              <span class="menu-ic mi-recent"></span>
+              <span class="menu-text">
+                <span class="menu-label">최근 알림에서 등록</span>
+                <span class="menu-meta" id="recentCount">0건</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="targets">
+              <span class="menu-ic mi-users"></span>
+              <span class="menu-text">
+                <span class="menu-label">등록된 대상</span>
+                <span class="menu-meta" id="rulesCount">0명</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="apps">
+              <span class="menu-ic mi-apps"></span>
+              <span class="menu-text">
+                <span class="menu-label">감시할 앱</span>
+                <span class="menu-meta" id="appsCount">—</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="keywords">
+              <span class="menu-ic mi-tag"></span>
+              <span class="menu-text">
+                <span class="menu-label">키워드</span>
+                <span class="menu-meta">필터</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+          </nav>
+        </section>
+
+        <!-- 디자인 허브: 테마 선택만 (향후 테마 추가를 위해 목록 스크롤) -->
+        <section class="page hub" id="page-design" data-page="design">
+          <div id="designPreview" class="design-preview hub-preview" data-style="siren_classic" data-frame="thick" data-font="giant">
+            <div class="preview-flash">
+              <div class="preview-sheet">
+                <div class="preview-head">긴급 알림</div>
+                <div class="preview-app">카카오톡</div>
+                <div class="preview-title">아내</div>
+                <div class="preview-body">지금 중요한 연락이 왔습니다</div>
+              </div>
+            </div>
+          </div>
+          <p class="hub-lead design-hub-lead">알림 연출 테마를 고르세요. 고른 테마가 바로 적용됩니다.</p>
+          <div id="themeSetList" class="theme-set-list" role="listbox" aria-label="테마 세트 선택"></div>
+          <p id="designMsg" class="hint feedback design-hub-msg"></p>
+          <div class="hub-actions design-hub-actions">
+            <button type="button" class="btn primary" data-sub="design-detail">세부 조정</button>
+            <button type="button" class="btn ghost" data-action="testCritical">화면으로 확인</button>
+          </div>
+        </section>
+
+        <!-- 설정 허브 -->
+        <section class="page hub" id="page-settings" data-page="settings">
+          <label class="master-toggle">
+            <span>
+              <strong>나야 알림</strong>
+              <small id="masterHint">켜면 조건에 맞는 알림을 울립니다</small>
+            </span>
+            <input type="checkbox" id="enabled" class="switch-input" role="switch" />
+          </label>
+          <nav class="menu-list">
+            <button type="button" class="menu-item" data-sub="alarm">
+              <span class="menu-ic mi-sliders"></span>
+              <span class="menu-text">
+                <span class="menu-label">알람 동작</span>
+                <span class="menu-meta">조건·유지·재알림</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="permissions">
+              <span class="menu-ic mi-shield"></span>
+              <span class="menu-text">
+                <span class="menu-label">권한</span>
+                <span class="menu-meta" id="permShort">확인</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="test">
+              <span class="menu-ic mi-play"></span>
+              <span class="menu-text">
+                <span class="menu-label">테스트</span>
+                <span class="menu-meta">소리·팝업</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="about">
+              <span class="menu-ic mi-info"></span>
+              <span class="menu-text">
+                <span class="menu-label">앱 정보</span>
+                <span class="menu-meta" id="versionShort">—</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+          </nav>
+        </section>
+      </main>
+
+      <!-- ===== 하위 페이지 (목록만 스크롤) ===== -->
+      <div class="subpages" id="subpages">
+        <section class="subpage" id="sub-setup" data-sub="setup">
+          <div class="setup-intro">
+            <span class="setup-intro-ic ic-shield"></span>
+            <div class="setup-intro-txt">
+              <strong id="setupIntroTitle">3단계면 준비 끝</strong>
+              <span>처음 한 번만 허용하면 됩니다.</span>
+            </div>
+          </div>
+          <div class="perm-cards">
+            <button type="button" class="perm-card" data-action="openListener">
+              <span class="perm-ic pic-bell"></span>
+              <span class="perm-body">
+                <strong>알림 접근</strong>
+                <span class="perm-desc">카톡·메일 알림을 읽어 중요한 것만 골라냅니다</span>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-step">1</span>
+            </button>
+            <button type="button" class="perm-card" data-action="openOverlay">
+              <span class="perm-ic pic-layers"></span>
+              <span class="perm-body">
+                <strong>다른 앱 위에 표시</strong>
+                <span class="perm-desc">사용 중·잠금화면에서 팝업으로 크게 알려 줍니다</span>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-step">2</span>
+            </button>
+            <button type="button" class="perm-card play-hide-fsi" data-action="openFsi">
+              <span class="perm-ic pic-lock"></span>
+              <span class="perm-body">
+                <strong>잠금화면 전체 알림</strong>
+                <span class="perm-desc">잠금 상태에서도 화면을 깨워 표시합니다</span>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-step">3</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="subpage scroll" id="sub-recent" data-sub="recent">
+          <p class="sub-lead">탭해서 감시 대상으로 등록하세요.</p>
+          <div id="recentList" class="recent-list"></div>
+          <button type="button" class="btn ghost block" data-action="clearRecent">목록 비우기</button>
+          <p id="filtersMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-targets" data-sub="targets">
+          <div id="rulesList" class="rules-list"></div>
+        </section>
+
+        <section class="subpage scroll" id="sub-rule-alert" data-sub="rule-alert">
+          <p class="sub-lead" id="ruleAlertName">대상 알림 설정</p>
+
+          <p class="rule-setting-title">프로필 사진</p>
+          <div class="rule-avatar-editor">
+            <div class="rule-avatar-preview" id="ruleAvatarPreview" aria-label="프로필 사진 미리보기">
+              <img id="ruleAvatarImage" alt="대상 프로필 사진" hidden />
+              <span id="ruleAvatarInitial" aria-hidden="true">?</span>
+            </div>
+            <div class="rule-avatar-controls">
+              <p>알림 화면에서 대상을 바로 알아볼 수 있습니다.</p>
+              <div class="rule-avatar-actions">
+                <button type="button" class="btn primary" id="btnPickRuleAvatar">사진 선택</button>
+                <button type="button" class="btn ghost" id="btnClearRuleAvatar">사진 제거</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="rule-setting-title">알림 강도</p>
+          <div class="rule-level-grid" role="group" aria-label="알림 강도 선택">
+            <button type="button" class="rule-level-btn" data-rule-level="NORMAL">
+              <strong>일반</strong>
+              <small>선택한 효과음으로 알림</small>
+            </button>
+            <button type="button" class="rule-level-btn" data-rule-level="CRITICAL">
+              <strong>초긴급</strong>
+              <small>화면 점멸·강한 알림</small>
+            </button>
+          </div>
+
+          <p class="rule-setting-title">효과음</p>
+          <div id="ruleSoundPickGrid" class="sound-pick-grid" aria-label="대상 효과음 선택"></div>
+
+          <button type="button" class="btn primary block" id="btnSaveRuleAlert">저장</button>
+          <p id="ruleAlertMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-apps" data-sub="apps">
+          <p class="sub-lead">선택한 앱만 검사합니다.</p>
+          <div id="appList" class="app-list"></div>
+          <button type="button" class="btn ghost block" data-sub="app-add">내 앱 추가</button>
+          <button type="button" class="btn primary block" id="btnSaveApps">저장</button>
+          <p id="appsMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-app-add" data-sub="app-add">
+          <p class="sub-lead">휴대폰에 설치된 앱을 검색해 추가하세요.</p>
+          <label class="app-search">
+            <span class="app-search-icon" aria-hidden="true">⌕</span>
+            <input type="search" id="appAddSearch" placeholder="앱 이름 검색" autocomplete="off" />
+          </label>
+          <p class="app-add-count" id="appAddCount">0개 선택</p>
+          <div id="installedAppList" class="installed-app-list"></div>
+          <button type="button" class="btn primary block" id="btnAddSelectedApps">선택 앱 추가</button>
+          <p id="appAddMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage" id="sub-keywords" data-sub="keywords">
+          <label class="field">
+            <span>일반 (쉼표 구분)</span>
+            <textarea id="keywords" rows="3" placeholder="계약, 분쟁, 발주"></textarea>
+          </label>
+          <label class="field">
+            <span>초긴급 · 사이렌</span>
+            <textarea id="criticalKeywords" rows="2" placeholder="긴급, paypal"></textarea>
+          </label>
+          <button type="button" class="btn primary block" id="btnSaveFilters">저장</button>
+        </section>
+
+        <section class="subpage scroll design-style-page" id="sub-design-detail" data-sub="design-detail">
+          <div class="design-style-preview-wrap">
+            <p class="design-preview-label" id="designDetailSetLabel">현재 테마</p>
+            <div id="designDetailPreview" class="design-preview sub-preview style-sub-preview" data-style="siren_classic" data-frame="thick" data-font="giant">
+              <div class="preview-flash">
+                <div class="preview-sheet">
+                  <div class="preview-head">긴급 알림</div>
+                  <div class="preview-app">카카오톡</div>
+                  <div class="preview-title">아내</div>
+                  <div class="preview-body">지금 중요한 연락이 왔습니다</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="sub-lead design-style-lead" id="designDetailHint">원하는 항목만 세부 조정할 수 있습니다.</p>
+          <nav class="menu-list detail-menu-list">
+            <button type="button" class="menu-item" data-sub="design-style" id="detailStyleItem">
+              <span class="menu-ic mi-palette"></span>
+              <span class="menu-text">
+                <span class="menu-label">스타일</span>
+                <span class="menu-meta" id="styleLabel">사이렌 레드</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="design-frame" id="detailFrameItem">
+              <span class="menu-ic mi-frame"></span>
+              <span class="menu-text">
+                <span class="menu-label">프레임</span>
+                <span class="menu-meta" id="frameLabel">두꺼운 테두리</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="design-font">
+              <span class="menu-ic mi-font"></span>
+              <span class="menu-text">
+                <span class="menu-label">글꼴</span>
+                <span class="menu-meta" id="fontLabel">초대형</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="design-sound">
+              <span class="menu-ic mi-sliders"></span>
+              <span class="menu-text">
+                <span class="menu-label">소리·음성</span>
+                <span class="menu-meta" id="soundLabel">나야 · TTS 꺼짐</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+          </nav>
+          <p id="designDetailMsg" class="hint feedback"></p>
+          <div class="hub-actions detail-actions">
+            <button type="button" class="btn primary" id="btnSaveDesign">저장</button>
+            <button type="button" class="btn ghost" data-action="testCritical">화면 확인</button>
+          </div>
+        </section>
+
+        <section class="subpage scroll design-style-page" id="sub-design-style" data-sub="design-style">
+
+          <div class="design-style-preview-wrap">
+            <p class="design-preview-label" id="styleSubPreviewLabel">사이렌 레드</p>
+            <div id="designSubPreview" class="design-preview sub-preview style-sub-preview" data-style="siren_classic" data-frame="thick" data-font="giant">
+              <div class="preview-flash">
+                <div class="preview-sheet">
+                  <div class="preview-head">긴급 알림</div>
+                  <div class="preview-app">카카오톡</div>
+                  <div class="preview-title">아내</div>
+                  <div class="preview-body">지금 중요한 연락이 왔습니다</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="designStylePickGrid" class="theme-pack-sections" aria-label="스타일 선택"></div>
+          <button type="button" class="btn primary block" id="btnStyleDone">선택 완료</button>
+        </section>
+
+        <section class="subpage scroll design-style-page" id="sub-design-frame" data-sub="design-frame">
+
+          <div class="design-style-preview-wrap">
+            <p class="design-preview-label" id="frameSubPreviewLabel">두꺼운 테두리</p>
+            <div id="designFrameSubPreview" class="design-preview sub-preview frame-sub-preview" data-style="siren_classic" data-frame="thick" data-font="giant">
+              <div class="preview-flash">
+                <div class="preview-sheet">
+                  <div class="preview-head">긴급 알림</div>
+                  <div class="preview-app">카카오톡</div>
+                  <div class="preview-title">아내</div>
+                  <div class="preview-body">지금 중요한 연락이 왔습니다</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="designFramePickGrid" class="theme-pack-sections" aria-label="프레임 선택"></div>
+          <button type="button" class="btn primary block" id="btnFrameDone">선택 완료</button>
+        </section>
+
+        <section class="subpage scroll design-style-page" id="sub-design-font" data-sub="design-font">
+
+          <div class="design-style-preview-wrap">
+            <p class="design-preview-label" id="fontSubPreviewLabel">초대형</p>
+            <div id="designFontSubPreview" class="design-preview sub-preview style-sub-preview" data-style="siren_classic" data-frame="thick" data-font="giant">
+              <div class="preview-flash">
+                <div class="preview-sheet">
+                  <div class="preview-head">긴급 알림</div>
+                  <div class="preview-app">카카오톡</div>
+                  <div class="preview-title">아내</div>
+                  <div class="preview-body">지금 중요한 연락이 왔습니다</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="designFontPickGrid" class="theme-pack-sections" aria-label="글꼴 선택"></div>
+          <button type="button" class="btn primary block" id="btnFontDone">선택 완료</button>
+        </section>
+
+        <section class="subpage scroll design-style-page" id="sub-design-sound" data-sub="design-sound">
+          <p class="sub-lead design-style-lead">알림 효과음과 메시지 읽기를 선택합니다.</p>
+          <div id="designSoundPickGrid" class="sound-pick-grid" aria-label="효과음 선택"></div>
+          <label class="row sound-tts-row">
+            <span>
+              <strong>메시지 전체 읽기</strong>
+              <small>끄면 선택한 효과음만 들립니다</small>
+            </span>
+            <input type="checkbox" id="tts" />
+          </label>
+          <button type="button" class="btn primary block" id="btnSoundDone">선택 완료</button>
+        </section>
+
+        <section class="subpage" id="sub-alarm" data-sub="alarm">
+          <label class="row"><span>키워드 일치할 때만</span><input type="checkbox" id="requireKeyword" /></label>
+          <label class="row"><span id="stickyLabel">확인 전까지 유지</span><input type="checkbox" id="sticky" /></label>
+          <label class="row"><span>화면 점멸</span><input type="checkbox" id="flash" /></label>
+          <label class="field">
+            <span id="snoozeLabel">재알림 간격 (분)</span>
+            <input type="number" id="snoozeMinutes" min="0" max="60" />
+          </label>
+          <button type="button" class="btn primary block" id="btnSave">저장</button>
+          <p id="saveMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage" id="sub-permissions" data-sub="permissions">
+          <p id="permDetail" class="sub-lead"></p>
+          <div class="btn-stack">
+            <button type="button" class="btn primary" data-action="openListener">알림 접근</button>
+            <button type="button" class="btn ghost" data-action="openOverlay">다른 앱 위에 표시</button>
+            <button type="button" class="btn ghost play-hide-fsi" data-action="openFsi">잠금화면 전체 알림</button>
+          </div>
+        </section>
+
+        <section class="subpage" id="sub-test" data-sub="test">
+          <div class="btn-stack test-stack">
+            <button type="button" class="btn ghost" data-action="testNormal">일반 알림 테스트</button>
+            <button type="button" class="btn primary" data-action="testCritical">사이렌 알림 테스트</button>
+          </div>
+          <p class="sub-lead test-log-lead">실제 알림이 울렸는지·무시됐는지 확인합니다. (업데이트와 무관)</p>
+          <p id="logBox" class="log muted-log">이벤트 없음</p>
+        </section>
+
+        <section class="subpage" id="sub-about" data-sub="about">
+          <p id="versionLabel" class="about-version"></p>
+          <p class="hint about-hint play-hide-update">삭제 없이 덮어쓰기 설치됩니다.</p>
+          <p class="hint about-hint play-only-update" hidden>업데이트는 Google Play에서 제공됩니다.</p>
+          <button type="button" class="btn primary block play-hide-update" data-action="checkUpdate">업데이트 확인</button>
+          <button type="button" class="btn ghost block play-only-update" data-action="checkUpdate" hidden>업데이트 안내</button>
+          <p class="hint about-hint">새 버전이 있으면 다운로드·설치 화면이 열립니다.</p>
+          <button type="button" class="menu-link block" data-sub="privacy">개인정보처리방침</button>
+        </section>
+
+        <section class="subpage privacy-sub" id="sub-privacy" data-sub="privacy">
+          <div class="privacy-pager" data-privacy-pager>
+            <div class="privacy-page is-active" data-page-idx="0">
+              <h1 class="doc-h1">개인정보처리방침</h1>
+              <p class="doc-lead">나야(NaYa)는 알림을 기기 안에서만 처리합니다. 본 방침은 Google Play 및 관계 법령에 따른 고지입니다.</p>
+              <p class="doc-meta">시행일: 2026년 7월 19일 · 버전 1.2</p>
+              <section class="card privacy-card">
+                <h2>1. 처리하는 정보</h2>
+                <ul class="bullets">
+                  <li>사용자가 허용한 <strong>알림 접근</strong>으로, 선택한 앱의 알림 제목·본문을 기기에서 읽습니다.</li>
+                  <li>필터용 키워드, 감시 앱·대상 목록, 알람 옵션과 사용자가 선택한 대상 프로필 사진은 기기 내부 저장소에만 보관됩니다.</li>
+                  <li>계정·로그인·클라우드 동기화 기능은 없습니다.</li>
+                </ul>
+              </section>
+              <section class="card privacy-card">
+                <h2>2. 외부 전송</h2>
+                <ul class="bullets">
+                  <li><strong>알림 내용·키워드·감시 규칙·대상 프로필 사진을 외부 서버로 전송하지 않습니다.</strong></li>
+                  <li class="play-hide-update">인터넷은 <strong>앱 업데이트 확인·APK 다운로드</strong>에만 사용하며, 알림 데이터 수집·분석에는 사용하지 않습니다.</li>
+                  <li class="play-only-update" hidden>앱 자체는 알림 데이터를 전송하지 않습니다. Google Play를 통한 앱 업데이트는 Play 정책에 따릅니다.</li>
+                  <li>본 앱은 은행 입금 수신·정산 서버 연동과 무관합니다.</li>
+                </ul>
+              </section>
+            </div>
+            <div class="privacy-page" data-page-idx="1">
+              <section class="card privacy-card">
+                <h2>3. 이용 목적</h2>
+                <p class="hint" style="margin:0">중요한 알림을 놓치지 않도록, 선택한 조건에 맞는 알림을 화면 팝업·소리·음성으로 다시 알려 주기 위함입니다.</p>
+              </section>
+              <section class="card privacy-card">
+                <h2>4. 권한</h2>
+                <ul class="bullets">
+                  <li>알림 접근 — 핵심 기능</li>
+                  <li class="play-hide-update">인터넷 — 앱 업데이트 확인·설치 파일 다운로드만</li>
+                  <li>다른 앱 위에 표시 — 사용 중 팝업 표시</li>
+                  <li class="play-hide-fsi">전체 화면 알림 — 잠금 화면 표시 (사이드로드 빌드)</li>
+                  <li>알림·진동 — 재알림 및 표시</li>
+                  <li class="play-hide-update">정확한 알람 — 재알림 스케줄 (사이드로드 빌드)</li>
+                </ul>
+              </section>
+            </div>
+            <div class="privacy-page" data-page-idx="2">
+              <section class="card privacy-card">
+                <h2>5. 보관 및 삭제</h2>
+                <p class="hint" style="margin:0">설정·최근 알림 목록은 앱 데이터 삭제 또는 앱 제거 시 함께 삭제됩니다. 별도 서버 보관 기간은 없습니다.</p>
+              </section>
+              <section class="card privacy-card">
+                <h2>6. 문의</h2>
+                <p class="hint" style="margin:0">개인정보 관련 문의: <a href="mailto:contact@heartlinktoday.com">contact@heartlinktoday.com</a></p>
+              </section>
+            </div>
+          </div>
+          <div class="privacy-nav" data-privacy-nav>
+            <button type="button" class="btn ghost privacy-prev" data-privacy-prev disabled>이전</button>
+            <div class="privacy-dots" data-privacy-dots>
+              <button type="button" class="privacy-dot is-active" data-go="0" aria-label="1페이지">1</button>
+              <button type="button" class="privacy-dot" data-go="1" aria-label="2페이지">2</button>
+              <button type="button" class="privacy-dot" data-go="2" aria-label="3페이지">3</button>
+            </div>
+            <button type="button" class="btn primary privacy-next" data-privacy-next>다음</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <nav class="tabbar" id="tabbar" role="tablist" aria-label="주요 메뉴">
+      <button type="button" class="tab is-active" data-tab="home" role="tab" aria-selected="true">
+        <span class="tab-ic ic-home"></span><span class="tab-label">홈</span>
+      </button>
+      <button type="button" class="tab" data-tab="rules" role="tab" aria-selected="false">
+        <span class="tab-ic ic-target"></span><span class="tab-label">규칙</span>
+      </button>
+      <button type="button" class="tab" data-tab="design" role="tab" aria-selected="false">
+        <span class="tab-ic ic-palette"></span><span class="tab-label">디자인&사운드</span>
+      </button>
+      <button type="button" class="tab" data-tab="settings" role="tab" aria-selected="false">
+        <span class="tab-ic ic-gear"></span><span class="tab-label">설정</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="privacy.js?v=play096"></script>
+  <script src="app.js?v=0921"></script>
+</body>
+</html>
