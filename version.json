@@ -1,6 +1,6 @@
 {
-  "versionCode": 46,
-  "versionName": "0.9.28",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.28/naya.apk",
-  "releaseNotes": "Fix app icon black corners — transparent cutout launcher icons"
+  "versionCode": 47,
+  "versionName": "0.9.29",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.29/naya.apk",
+  "releaseNotes": "Pull-to-refresh: reload Web UI and check Play/sideload updates"
 }
