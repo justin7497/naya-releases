@@ -1,6 +1,6 @@
 {
-  "versionCode": 49,
-  "versionName": "0.9.31",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.31/naya.apk",
-  "releaseNotes": "Auto-refresh remote Web UI on launch; settings screen refresh button"
+  "versionCode": 50,
+  "versionName": "0.9.32",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.32/naya.apk",
+  "releaseNotes": "Home banner tap-to-zoom for all 3 slides"
 }
