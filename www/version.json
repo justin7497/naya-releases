@@ -1,1 +1,6 @@
-{"versionName":"0.9.32","versionCode":50}
+{
+    "webUiRevision": 3,
+    "remoteBaseUrl": "https://justin7497.github.io/naya-releases/www",
+    "versionName": "0.9.32",
+    "versionCode": 50
+}
