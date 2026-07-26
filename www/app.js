@@ -420,6 +420,119 @@
       if (document.hidden) stopHeroAutoplay();
       else startHeroAutoplay();
     });
+
+    bindHeroLightbox(track);
+  }
+
+  let heroLightboxIdx = 0;
+  let heroSwipeMoved = false;
+
+  function heroZoomButtons() {
+    return [...document.querySelectorAll(".home-hero-zoom")];
+  }
+
+  function heroImageAt(idx) {
+    const btn = heroZoomButtons()[idx];
+    if (!btn) return null;
+    const img = btn.querySelector("img");
+    if (!img) return null;
+    return { src: img.currentSrc || img.src, alt: img.alt || "" };
+  }
+
+  function renderHeroLightbox(idx) {
+    const box = $("heroLightbox");
+    const imgEl = $("heroLightboxImg");
+    const capEl = $("heroLightboxCap");
+    const slides = heroSlides();
+    if (!box || !imgEl || !slides.length) return;
+    heroLightboxIdx = ((idx % slides.length) + slides.length) % slides.length;
+    const data = heroImageAt(heroLightboxIdx);
+    if (!data) return;
+    imgEl.src = data.src;
+    imgEl.alt = data.alt;
+    if (capEl) capEl.textContent = data.alt;
+    const prev = $("heroLightboxPrev");
+    const next = $("heroLightboxNext");
+    if (prev) prev.hidden = slides.length < 2;
+    if (next) next.hidden = slides.length < 2;
+  }
+
+  function openHeroLightbox(idx) {
+    const box = $("heroLightbox");
+    if (!box) return;
+    pauseHeroBriefly();
+    renderHeroLightbox(idx);
+    box.hidden = false;
+    box.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeHeroLightbox() {
+    const box = $("heroLightbox");
+    if (!box || box.hidden) return false;
+    box.hidden = true;
+    box.classList.remove("is-open");
+    document.body.style.overflow = "";
+    return true;
+  }
+
+  function bindHeroLightbox(track) {
+    if (document.body.dataset.heroLbBound === "1") return;
+    document.body.dataset.heroLbBound = "1";
+
+    track.addEventListener(
+      "touchstart",
+      (e) => {
+        heroSwipeMoved = false;
+        if (e.touches.length === 1) {
+          bindHeroLightbox._sx = e.touches[0].clientX;
+        }
+      },
+      { passive: true },
+    );
+    track.addEventListener(
+      "touchmove",
+      (e) => {
+        if (e.touches.length !== 1 || bindHeroLightbox._sx == null) return;
+        if (Math.abs(e.touches[0].clientX - bindHeroLightbox._sx) > 10) {
+          heroSwipeMoved = true;
+        }
+      },
+      { passive: true },
+    );
+
+    heroZoomButtons().forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        if (heroSwipeMoved) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openHeroLightbox(Number(btn.getAttribute("data-hero-zoom") || 0));
+      });
+    });
+
+    $("heroLightboxClose")?.addEventListener("click", () => closeHeroLightbox());
+    $("heroLightboxPrev")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx - 1));
+    $("heroLightboxNext")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx + 1));
+    $("heroLightboxBody")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeHeroLightbox();
+    });
+
+    let lbTouchX = 0;
+    const box = $("heroLightbox");
+    box?.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length === 1) lbTouchX = e.touches[0].clientX;
+      },
+      { passive: true },
+    );
+    box?.addEventListener("touchend", (e) => {
+      if (!box || box.hidden) return;
+      const dx = e.changedTouches[0].clientX - lbTouchX;
+      if (Math.abs(dx) < 56) return;
+      if (dx < 0) renderHeroLightbox(heroLightboxIdx + 1);
+      else renderHeroLightbox(heroLightboxIdx - 1);
+    });
   }
 
   /* 모든 화면 이동은 이벤트 위임 한 곳에서 처리 */
@@ -1360,6 +1473,7 @@
   function canStartPull(target) {
     if (!target || !(target instanceof Element)) return true;
     if (target.closest("#homeHeroTrack, .home-hero-track")) return false;
+    if (target.closest(".hero-lightbox")) return false;
     if (target.closest("input, textarea, select, [contenteditable='true']")) return false;
     return true;
   }
@@ -1611,7 +1725,10 @@
       }
     },
     /** @returns {boolean} true = 인앱에서 처리(이전화면), false = 홈이라 앱 백그라운드 */
-    onBack: () => goBack(),
+    onBack: () => {
+      if (closeHeroLightbox()) return true;
+      return goBack();
+    },
   };
 
   function fitShellToScreen() {
