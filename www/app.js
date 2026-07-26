@@ -496,6 +496,10 @@
     const openFromBtn = () => openHeroLightbox(heroZoomIndex(btn));
 
     btn.addEventListener("click", (e) => {
+      if (btn._heroTapConsumed) {
+        btn._heroTapConsumed = false;
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       openFromBtn();
@@ -514,6 +518,7 @@
         if (dx > 28 || dy > 28 || dt > 800) return;
         e.preventDefault();
         e.stopPropagation();
+        btn._heroTapConsumed = true;
         openFromBtn();
       },
       { passive: false },
