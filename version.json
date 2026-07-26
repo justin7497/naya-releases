@@ -1,6 +1,6 @@
 {
-  "versionCode": 47,
-  "versionName": "0.9.29",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.29/naya.apk",
-  "releaseNotes": "Pull-to-refresh: reload Web UI and check Play/sideload updates"
+  "versionCode": 48,
+  "versionName": "0.9.30",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.30/naya.apk",
+  "releaseNotes": "In-app update notice banner (replaces pull-to-refresh)"
 }
