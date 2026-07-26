@@ -1629,6 +1629,7 @@
         case "openOverlay": call("openOverlaySettings"); break;
         case "openFsi": call("openFullScreenSettings"); break;
         case "checkUpdate": call("checkForUpdate"); break;
+        case "reloadWebUi": call("reloadWebUi"); break;
         case "testNormal":
           call("saveSettings", JSON.stringify(designPayload()));
           call("testAlert", "normal");
