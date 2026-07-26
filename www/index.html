@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=herozoom2" />
+  <link rel="stylesheet" href="app.css?v=0931" />
 </head>
 <body>
   <div class="app-shell">
@@ -481,9 +481,11 @@
           <p id="versionLabel" class="about-version"></p>
           <p class="hint about-hint play-hide-update">삭제 없이 덮어쓰기 설치됩니다.</p>
           <p class="hint about-hint play-only-update" hidden>Google Play에서 새 버전을 확인하고 설치할 수 있습니다.</p>
-          <button type="button" class="btn primary block play-hide-update" data-action="checkUpdate">업데이트 확인</button>
-          <button type="button" class="btn primary block play-only-update" data-action="checkUpdate" hidden>업데이트 확인</button>
-          <p class="hint about-hint">새 버전이 있으면 다운로드·설치 화면이 열립니다.</p>
+          <button type="button" class="btn secondary block" data-action="reloadWebUi">최신 화면 받기</button>
+          <p class="hint about-hint">배너·확대 보기 등 화면만 바뀐 경우, 앱 업데이트 없이 위 버튼으로 받을 수 있습니다.</p>
+          <button type="button" class="btn primary block play-hide-update" data-action="checkUpdate">앱 업데이트 확인</button>
+          <button type="button" class="btn primary block play-only-update" data-action="checkUpdate" hidden>앱 업데이트 확인</button>
+          <p class="hint about-hint">앱(아이콘·음성·기능) 새 버전이 있을 때만 설치 화면이 열립니다. 이미 최신이면 안내합니다.</p>
           <button type="button" class="menu-link block" data-sub="privacy">개인정보처리방침</button>
         </section>
 
@@ -579,6 +581,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=herozoom2"></script>
+  <script src="app.js?v=0931"></script>
 </body>
 </html>
