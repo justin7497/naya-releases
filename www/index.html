@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=rev5" />
+  <link rel="stylesheet" href="app.css?v=rev6" />
 </head>
 <body>
   <div class="app-shell">
@@ -601,13 +601,16 @@
     <button type="button" class="hero-lightbox-nav prev" id="heroLightboxPrev" aria-label="이전 배너">‹</button>
     <button type="button" class="hero-lightbox-nav next" id="heroLightboxNext" aria-label="다음 배너">›</button>
     <div class="hero-lightbox-body" id="heroLightboxBody">
-      <img id="heroLightboxImg" src="" alt="" />
+      <div class="hero-lightbox-pinch" id="heroLightboxPinch">
+        <img id="heroLightboxImg" src="" alt="" draggable="false" />
+      </div>
+      <p class="hero-lightbox-pinch-hint" id="heroLightboxPinchHint">두 손가락으로 확대 · 드래그로 이동</p>
       <p class="hero-lightbox-cap" id="heroLightboxCap"></p>
     </div>
   </div>
 
-  <script src="hero-zoom.js?v=rev5"></script>
+  <script src="hero-zoom.js?v=rev6"></script>
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev5"></script>
+  <script src="app.js?v=rev6"></script>
 </body>
 </html>
