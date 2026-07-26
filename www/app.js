@@ -1357,7 +1357,6 @@
     document.querySelectorAll(".play-hide-fsi").forEach((el) => {
       el.hidden = !caps.fsiSupported;
     });
-    updatePullRefreshLabel();
     const intro = $("setupIntroTitle");
     if (intro) {
       intro.textContent = caps.fsiSupported
@@ -1385,6 +1384,7 @@
       exactAlarmEnabled: st.exactAlarmEnabled !== false,
     };
     applyDistributionUi();
+    applyUpdateNotice(st);
 
     const ver = st.versionName || "—";
     const uiTag = st.webUiSource === "remote" ? " · UI 원격" : "";
@@ -1446,146 +1446,34 @@
     renderRules(st.watchRules || parseJson(call("getWatchRules"), []));
   }
 
-  const pullState = {
-    active: false,
-    startY: 0,
-    distance: 0,
-    busy: false,
-  };
-  const PULL_THRESHOLD = 72;
-
-  function pullRefreshDefaultLabel() {
-    const isPlay = caps.distribution === "play" || caps.selfUpdateEnabled === false;
-    return isPlay ? "화면 새로고침 · Play 업데이트 확인" : "화면 새로고침 · 업데이트 확인";
-  }
-
-  function updatePullRefreshLabel(text) {
-    const label = $("pullRefreshLabel");
-    if (label) label.textContent = text || pullRefreshDefaultLabel();
-  }
-
-  function isAtScrollTop() {
-    const scrollEl = document.querySelector(".subpage.is-active.scroll");
-    if (scrollEl) return scrollEl.scrollTop <= 1;
-    return true;
-  }
-
-  function canStartPull(target) {
-    if (!target || !(target instanceof Element)) return true;
-    if (target.closest("#homeHeroTrack, .home-hero-track")) return false;
-    if (target.closest(".hero-lightbox")) return false;
-    if (target.closest("input, textarea, select, [contenteditable='true']")) return false;
-    return true;
-  }
-
-  function setPullVisible(visible, loading) {
-    const el = $("pullRefresh");
-    if (!el) return;
-    el.classList.toggle("is-visible", visible);
-    el.classList.toggle("is-loading", !!loading);
-    el.setAttribute("aria-hidden", visible ? "false" : "true");
-  }
-
-  function reloadWebUiFallback() {
-    try {
-      if (/^https?:/.test(window.location.protocol)) {
-        const hash = window.location.hash || "";
-        const base = window.location.href
-          .split("#")[0]
-          .replace(/([&?])_refresh=\d+/g, "$1")
-          .replace(/[?&]$/, "");
-        const sep = base.includes("?") ? "&" : "?";
-        window.location.replace(`${base}${sep}_refresh=${Date.now()}${hash}`);
-        return true;
+  function applyUpdateNotice(st) {
+    const banner = $("updateBanner");
+    const title = $("updateBannerTitle");
+    const sub = $("updateBannerSub");
+    if (!banner) return;
+    const notice = st?.updateNotice || {};
+    const show = notice.show === true;
+    banner.hidden = !show;
+    if (!show) return;
+    const isPlay = notice.distribution === "play" || caps.distribution === "play";
+    if (notice.installReady) {
+      if (title) title.textContent = "업데이트 설치 준비 완료";
+      if (sub) {
+        sub.textContent = isPlay
+          ? "다운로드가 끝났습니다. 지금 설치하세요"
+          : "다운로드가 끝났습니다. 지금 설치하세요";
       }
-    } catch (_) {
-      /* ignore */
+      return;
     }
-    return false;
-  }
-
-  function runPullRefresh() {
-    if (pullState.busy) return;
-    pullState.busy = true;
-    setPullVisible(true, true);
-    updatePullRefreshLabel("새로고침 중…");
-    refresh();
-    let nativeReload = false;
-    try {
-      call("reloadWebUi");
-      nativeReload = true;
-    } catch (_) {
-      nativeReload = false;
+    const ver = notice.versionName || "";
+    if (title) {
+      title.textContent = ver ? `새 버전 ${ver} 사용 가능` : "새 버전 사용 가능";
     }
-    if (!nativeReload) reloadWebUiFallback();
-    try {
-      call("checkForUpdate");
-    } catch (_) {
-      /* 구버전 APK */
+    if (sub) {
+      sub.textContent = isPlay
+        ? "Google Play에서 업데이트할 수 있습니다"
+        : "삭제 없이 덮어쓰기 설치됩니다";
     }
-    if (!nativeReload && /^https?:/.test(window.location.protocol)) return;
-    window.setTimeout(() => {
-      pullState.busy = false;
-      setPullVisible(false, false);
-      updatePullRefreshLabel();
-    }, 900);
-  }
-
-  function bindPullToRefresh() {
-    const shell = document.querySelector(".app-shell");
-    if (!shell) return;
-
-    shell.addEventListener(
-      "touchstart",
-      (e) => {
-        if (pullState.busy) return;
-        if (!isAtScrollTop()) return;
-        if (!canStartPull(e.target)) return;
-        if (e.touches.length !== 1) return;
-        pullState.active = true;
-        pullState.startY = e.touches[0].clientY;
-        pullState.distance = 0;
-      },
-      { passive: true },
-    );
-
-    shell.addEventListener(
-      "touchmove",
-      (e) => {
-        if (!pullState.active || pullState.busy) return;
-        const dy = e.touches[0].clientY - pullState.startY;
-        if (dy <= 0) {
-          pullState.distance = 0;
-          setPullVisible(false, false);
-          return;
-        }
-        if (!isAtScrollTop()) {
-          pullState.active = false;
-          setPullVisible(false, false);
-          return;
-        }
-        pullState.distance = dy;
-        setPullVisible(dy > 20, false);
-        updatePullRefreshLabel(dy >= PULL_THRESHOLD ? "놓으면 새로고침" : pullRefreshDefaultLabel());
-        if (dy > 10 && e.cancelable) e.preventDefault();
-      },
-      { passive: false },
-    );
-
-    const endPull = () => {
-      if (!pullState.active) return;
-      const shouldRefresh = pullState.distance >= PULL_THRESHOLD;
-      pullState.active = false;
-      pullState.distance = 0;
-      if (shouldRefresh) runPullRefresh();
-      else {
-        setPullVisible(false, false);
-        updatePullRefreshLabel();
-      }
-    };
-
-    shell.addEventListener("touchend", endPull, { passive: true });
-    shell.addEventListener("touchcancel", endPull, { passive: true });
   }
 
   function refresh() {
@@ -1680,6 +1568,16 @@
     setTimeout(refresh, 200);
   });
 
+  $("updateBannerDismiss")?.addEventListener("click", () => {
+    try {
+      call("dismissUpdateNotice");
+    } catch (_) {
+      const banner = $("updateBanner");
+      if (banner) banner.hidden = true;
+    }
+    refresh();
+  });
+
   document.querySelectorAll("[data-action]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const action = btn.getAttribute("data-action");
@@ -1718,6 +1616,7 @@
 
   window.NotiSirenWeb = {
     onResume: refresh,
+    onUpdateAvailable: refresh,
     onAvatarPicked: (ruleId, saved) => {
       refresh();
       if (ruleId === currentRuleId) {
@@ -1755,7 +1654,6 @@
   );
   fitShellToScreen();
   window.addEventListener("resize", fitShellToScreen);
-  bindPullToRefresh();
   refresh();
   setTimeout(refresh, 200);
 
