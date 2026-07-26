@@ -1,6 +1,6 @@
 {
-  "versionCode": 39,
-  "versionName": "0.9.21",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.21/naya.apk",
-  "releaseNotes": "Lock screen popup: overlay-first on all builds; Play activity fallback"
+  "versionCode": 44,
+  "versionName": "0.9.26",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.26/naya.apk",
+  "releaseNotes": "Brand voice: TTS and default sound now say 나야나야"
 }
