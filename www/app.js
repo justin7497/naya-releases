@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 5;
+  const WEB_UI_REVISION = 6;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -616,6 +616,7 @@
       { passive: true },
     );
     box?.addEventListener("touchend", (e) => {
+      if (window.__nayaHeroIsPinchZoomed?.()) return;
       if (!box || box.hidden) return;
       const dx = e.changedTouches[0].clientX - lbTouchX;
       if (Math.abs(dx) < 56) return;
