@@ -311,25 +311,55 @@
 
     let touchStart = null;
     let lastImageTapAt = 0;
+    let swipeGesture = false;
+
+    const clearTouch = () => {
+      touchStart = null;
+      swipeGesture = false;
+    };
 
     track.addEventListener(
       "touchstart",
       (e) => {
         if (e.touches.length !== 1) {
-          touchStart = null;
+          clearTouch();
           return;
         }
         const img = e.target.closest(".home-hero-img");
         if (!img) {
-          touchStart = null;
+          clearTouch();
           return;
         }
+        swipeGesture = false;
         touchStart = {
           x: e.touches[0].clientX,
           y: e.touches[0].clientY,
           t: Date.now(),
           img,
+          scrollLeft: track.scrollLeft,
         };
+      },
+      { passive: true },
+    );
+
+    track.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!touchStart || e.touches.length !== 1) return;
+        const dx = Math.abs(e.touches[0].clientX - touchStart.x);
+        const dy = Math.abs(e.touches[0].clientY - touchStart.y);
+        if (dx > 5 || dx >= dy) swipeGesture = true;
+        if (Math.abs(track.scrollLeft - touchStart.scrollLeft) > 1) swipeGesture = true;
+      },
+      { passive: true },
+    );
+
+    track.addEventListener("touchcancel", clearTouch, { passive: true });
+
+    track.addEventListener(
+      "scroll",
+      () => {
+        if (touchStart) swipeGesture = true;
       },
       { passive: true },
     );
@@ -343,8 +373,14 @@
         const dy = Math.abs(t.clientY - touchStart.y);
         const dt = Date.now() - touchStart.t;
         const img = touchStart.img;
-        touchStart = null;
-        if (dx > 16 || dy > 16 || dt > 800) return;
+        const scrolled = Math.abs(track.scrollLeft - touchStart.scrollLeft) > 2;
+        const wasSwipe = swipeGesture;
+        clearTouch();
+
+        if (wasSwipe || scrolled) return;
+        if (dx > 7 || dy > 10 || dt > 550) return;
+        if (dx > dy * 0.35) return;
+
         lastImageTapAt = Date.now();
         openLightbox(heroImgIndex(img));
       },
@@ -352,6 +388,7 @@
     );
 
     track.addEventListener("click", (e) => {
+      if ("ontouchstart" in window) return;
       if (Date.now() - lastImageTapAt < 450) return;
       const img = e.target.closest(".home-hero-img");
       if (!img) return;
