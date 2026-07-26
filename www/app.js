@@ -2,6 +2,12 @@
   const native = window.NotiSiren;
   const $ = (id) => document.getElementById(id);
 
+  /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
+  const WEB_UI_REVISION = 3;
+  const WEB_UI_REV_KEY = "naya_webui_applied_rev";
+  const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
+  const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
+
   let currentTab = "home";
   let currentSub = null;
   let currentRules = [];
@@ -1420,6 +1426,7 @@
     };
     applyDistributionUi();
     applyUpdateNotice(st);
+    checkWebUiUpdate(st);
 
     const ver = st.versionName || "—";
     const uiTag = st.webUiSource === "remote" ? " · UI 원격" : "";
@@ -1508,6 +1515,61 @@
       sub.textContent = isPlay
         ? "Google Play에서 업데이트할 수 있습니다"
         : "삭제 없이 덮어쓰기 설치됩니다";
+    }
+  }
+
+  function webUiRevStorage() {
+    try {
+      return window.localStorage;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function getDismissedWebUiRev() {
+    const ls = webUiRevStorage();
+    if (!ls) return 0;
+    const n = parseInt(ls.getItem(WEB_UI_DISMISS_KEY) || "0", 10);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function remoteWwwBase(st) {
+    const fromStatus = String(st?.webUiBaseUrl || "").replace(/\/$/, "");
+    if (fromStatus) return fromStatus;
+    return REMOTE_WWW_FALLBACK;
+  }
+
+  async function checkWebUiUpdate(st) {
+    const banner = $("webUiBanner");
+    if (!banner) return;
+    const base = remoteWwwBase(st);
+    if (!base) {
+      banner.hidden = true;
+      return;
+    }
+    try {
+      const res = await fetch(`${base}/version.json?_=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) {
+        banner.hidden = true;
+        return;
+      }
+      const data = await res.json();
+      const remoteRev = Number(data.webUiRevision) || 0;
+      const dismissed = getDismissedWebUiRev();
+      if (remoteRev <= WEB_UI_REVISION || remoteRev <= dismissed) {
+        banner.hidden = true;
+        return;
+      }
+      const title = $("webUiBannerTitle");
+      const sub = $("webUiBannerSub");
+      if (title) title.textContent = "새 화면 사용 가능";
+      if (sub) {
+        sub.textContent = `화면 ${WEB_UI_REVISION} → ${remoteRev} · 앱 설치 없이 업데이트`;
+      }
+      banner.dataset.remoteRev = String(remoteRev);
+      banner.hidden = false;
+    } catch (_) {
+      banner.hidden = true;
     }
   }
 
@@ -1613,6 +1675,14 @@
     refresh();
   });
 
+  $("webUiBannerDismiss")?.addEventListener("click", () => {
+    const banner = $("webUiBanner");
+    const rev = parseInt(banner?.dataset?.remoteRev || "0", 10);
+    const ls = webUiRevStorage();
+    if (ls && rev > 0) ls.setItem(WEB_UI_DISMISS_KEY, String(rev));
+    if (banner) banner.hidden = true;
+  });
+
   document.querySelectorAll("[data-action]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const action = btn.getAttribute("data-action");
@@ -1621,7 +1691,13 @@
         case "openOverlay": call("openOverlaySettings"); break;
         case "openFsi": call("openFullScreenSettings"); break;
         case "checkUpdate": call("checkForUpdate"); break;
-        case "reloadWebUi": call("reloadWebUi"); break;
+        case "reloadWebUi": {
+          const rev = parseInt($("webUiBanner")?.dataset?.remoteRev || "0", 10);
+          const ls = webUiRevStorage();
+          if (ls && rev > 0) ls.setItem(WEB_UI_REV_KEY, String(rev));
+          call("reloadWebUi");
+          break;
+        }
         case "testNormal":
           call("saveSettings", JSON.stringify(designPayload()));
           call("testAlert", "normal");
