@@ -68,6 +68,49 @@ html, body {
   background: var(--bg);
 }
 
+.pull-refresh {
+  position: absolute;
+  top: calc(var(--safe-top) + 6px);
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(25, 29, 38, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  transform: translate(-50%, -140%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.pull-refresh.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.pull-refresh.is-loading .pull-refresh-spinner {
+  animation: pullSpin 0.75s linear infinite;
+}
+.pull-refresh-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  white-space: nowrap;
+}
+.pull-refresh-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  border-top-color: #2563eb;
+  flex-shrink: 0;
+}
+@keyframes pullSpin {
+  to { transform: rotate(360deg); }
+}
+
 @media (min-width: 520px) {
   body { background: #e5e7eb; }
   .app-shell {
