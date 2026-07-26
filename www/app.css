@@ -474,7 +474,9 @@ html, body {
 }
 .home-hero-img {
   cursor: pointer;
-  touch-action: pan-x pan-y;
+  touch-action: pan-x;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 #page-home.page.hub {
   gap: 8px;
