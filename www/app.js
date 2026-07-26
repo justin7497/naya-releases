@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 3;
+  const WEB_UI_REVISION = 4;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -437,11 +437,14 @@
   }
 
   function heroImageAt(idx) {
+    const slides = heroSlides();
+    const slide = slides[idx];
     const btn = heroZoomButtons()[idx];
-    if (!btn) return null;
-    const img = btn.querySelector("img");
+    const img = btn?.querySelector("img") || slide?.querySelector("img");
     if (!img) return null;
-    return { src: img.currentSrc || img.src, alt: img.alt || "" };
+    const src = img.currentSrc || img.getAttribute("src") || img.src;
+    if (!src) return null;
+    return { src, alt: img.alt || "" };
   }
 
   function renderHeroLightbox(idx) {
@@ -468,8 +471,11 @@
     mountHeroLightbox();
     pauseHeroBriefly();
     renderHeroLightbox(idx);
+    box.removeAttribute("hidden");
     box.hidden = false;
     box.classList.add("is-open");
+    box.setAttribute("aria-hidden", "false");
+    document.body.classList.add("hero-lb-open");
     document.body.style.overflow = "hidden";
   }
 
@@ -477,7 +483,10 @@
     const box = $("heroLightbox");
     if (!box || box.hidden) return false;
     box.hidden = true;
+    box.setAttribute("hidden", "");
+    box.setAttribute("aria-hidden", "true");
     box.classList.remove("is-open");
+    document.body.classList.remove("hero-lb-open");
     document.body.style.overflow = "";
     return true;
   }
@@ -486,6 +495,77 @@
     const raw = btn?.getAttribute("data-hero-zoom");
     if (raw != null && raw !== "") return Number(raw);
     return heroIdx;
+  }
+
+  let heroZoomTapLock = 0;
+
+  function triggerHeroZoom(idx, e) {
+    if (Date.now() - heroZoomTapLock < 320) return;
+    heroZoomTapLock = Date.now();
+    if (e?.target?.closest?.(".home-hero-dot")) return;
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
+    openHeroLightbox(typeof idx === "number" && !Number.isNaN(idx) ? idx : heroIdx);
+  }
+
+  function attachHeroZoomActivator(el, fixedIdx) {
+    if (!el || el.dataset.zoomTapBound === "1") return;
+    el.dataset.zoomTapBound = "1";
+    let touchStart = null;
+
+    el.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length !== 1) return;
+        touchStart = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          t: Date.now(),
+        };
+      },
+      { passive: true },
+    );
+
+    el.addEventListener(
+      "touchend",
+      (e) => {
+        if (!touchStart) return;
+        const t = e.changedTouches[0];
+        const dx = Math.abs(t.clientX - touchStart.x);
+        const dy = Math.abs(t.clientY - touchStart.y);
+        const dt = Date.now() - touchStart.t;
+        touchStart = null;
+        if (dx > 20 || dy > 20 || dt > 800) return;
+        const idx =
+          typeof fixedIdx === "number"
+            ? fixedIdx
+            : el.classList?.contains("home-hero-zoom")
+              ? heroZoomIndex(el)
+              : heroIdx;
+        triggerHeroZoom(idx, e);
+      },
+      { passive: false },
+    );
+
+    el.addEventListener("click", (e) => {
+      const idx =
+        typeof fixedIdx === "number"
+          ? fixedIdx
+          : el.classList?.contains("home-hero-zoom")
+            ? heroZoomIndex(el)
+            : heroIdx;
+      triggerHeroZoom(idx, e);
+    });
+  }
+
+  function bindHeroZoomActivators() {
+    heroZoomButtons().forEach((btn) => {
+      attachHeroZoomActivator(btn, heroZoomIndex(btn));
+    });
+    heroSlides().forEach((slide, idx) => {
+      if (slide.querySelector(".home-hero-zoom")) return;
+      attachHeroZoomActivator(slide, idx);
+    });
   }
 
   function mountHeroLightbox() {
@@ -501,42 +581,12 @@
 
   function bindHeroLightbox(track) {
     mountHeroLightbox();
-    const hero = $("homeHero");
-    if (!hero || hero.dataset.zoomBound === "1") {
-      bindHeroLightboxControls();
-      return;
-    }
-    hero.dataset.zoomBound = "1";
-
-    let tapStart = null;
-    hero.addEventListener(
-      "pointerdown",
-      (e) => {
-        if (e.pointerType === "mouse" && e.button !== 0) return;
-        tapStart = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId };
-      },
-      { passive: true },
-    );
-    hero.addEventListener(
-      "pointerup",
-      (e) => {
-        if (!tapStart || e.pointerId !== tapStart.id) return;
-        const dx = Math.abs(e.clientX - tapStart.x);
-        const dy = Math.abs(e.clientY - tapStart.y);
-        const dt = Date.now() - tapStart.t;
-        tapStart = null;
-        if (e.target.closest(".home-hero-dot")) return;
-        if (dx > 26 || dy > 26 || dt > 900) return;
-        const btn = e.target.closest(".home-hero-zoom");
-        const idx = btn ? heroZoomIndex(btn) : heroIdx;
-        e.preventDefault();
-        e.stopPropagation();
-        openHeroLightbox(idx);
-      },
-      { passive: false },
-    );
-
     bindHeroLightboxControls();
+    if (document.body.dataset.heroZoomBound === "1") return;
+    document.body.dataset.heroZoomBound = "1";
+    bindHeroZoomActivators();
+    const hero = $("homeHero");
+    if (hero) attachHeroZoomActivator(hero);
   }
 
   function bindHeroLightboxControls() {
@@ -575,9 +625,7 @@
 
     const zoomBtn = target.closest(".home-hero-zoom");
     if (zoomBtn) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      openHeroLightbox(heroZoomIndex(zoomBtn));
+      triggerHeroZoom(heroZoomIndex(zoomBtn), ev);
       return;
     }
 
@@ -1769,13 +1817,15 @@
   refresh();
   setTimeout(refresh, 200);
 
+  window.__nayaHeroZoom = (e, idx) => triggerHeroZoom(idx, e);
+
   window.NayaNav = {
     openSubpage,
     closeSubpage,
     switchTab,
     navigate,
     goBack,
-    openHeroZoom: (idx) => openHeroLightbox(typeof idx === "number" ? idx : heroIdx),
+    openHeroZoom: (idx) => triggerHeroZoom(typeof idx === "number" ? idx : heroIdx),
     openDetailPick: () => openSubpage("design-detail"),
     openStylePick: () => openSubpage("design-style"),
     openFramePick: () => openSubpage("design-frame"),
