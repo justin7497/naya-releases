@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=herozoom3" />
+  <link rel="stylesheet" href="app.css?v=rev3" />
 </head>
 <body>
   <div class="app-shell">
@@ -25,7 +25,19 @@
       </button>
     </header>
 
-    <div class="update-banner" id="updateBanner" hidden role="status" aria-live="polite">
+    <div class="update-banner webui-banner" id="webUiBanner" hidden role="status" aria-live="polite">
+      <div class="update-banner-main">
+        <span class="update-banner-ic" aria-hidden="true">✦</span>
+        <div class="update-banner-text">
+          <strong id="webUiBannerTitle">새 화면 사용 가능</strong>
+          <span id="webUiBannerSub">앱 설치 없이 화면만 업데이트</span>
+        </div>
+      </div>
+      <button type="button" class="update-banner-action webui-banner-action" data-action="reloadWebUi">화면 업데이트</button>
+      <button type="button" class="update-banner-dismiss" id="webUiBannerDismiss" aria-label="알림 닫기">×</button>
+    </div>
+
+    <div class="update-banner app-banner" id="updateBanner" hidden role="status" aria-live="polite">
       <div class="update-banner-main">
         <span class="update-banner-ic" aria-hidden="true">↑</span>
         <div class="update-banner-text">
@@ -582,6 +594,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=herozoom3"></script>
+  <script src="app.js?v=rev3"></script>
 </body>
 </html>
