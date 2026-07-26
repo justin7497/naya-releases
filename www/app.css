@@ -72,6 +72,13 @@ html, body {
   display: none !important;
 }
 
+.update-banner.webui-banner {
+  background: linear-gradient(90deg, #0f766e 0%, #14b8a6 100%);
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.22);
+}
+.update-banner.webui-banner .update-banner-action {
+  color: #0f766e;
+}
 .update-banner {
   flex-shrink: 0;
   display: flex;
@@ -79,8 +86,10 @@ html, body {
   gap: 8px;
   margin: 0;
   padding: 10px 12px;
-  background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%);
   color: #fff;
+}
+.update-banner.app-banner {
+  background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%);
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
 }
 .update-banner[hidden] {
