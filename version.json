@@ -1,6 +1,6 @@
 {
-  "versionCode": 48,
-  "versionName": "0.9.30",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.30/naya.apk",
-  "releaseNotes": "In-app update notice banner (replaces pull-to-refresh)"
+  "versionCode": 49,
+  "versionName": "0.9.31",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.31/naya.apk",
+  "releaseNotes": "Auto-refresh remote Web UI on launch; settings screen refresh button"
 }
