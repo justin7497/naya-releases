@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 6;
+  const WEB_UI_REVISION = 7;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -432,15 +432,10 @@
 
   let heroLightboxIdx = 0;
 
-  function heroZoomButtons() {
-    return [...document.querySelectorAll(".home-hero-zoom")];
-  }
-
   function heroImageAt(idx) {
-    const slides = heroSlides();
-    const slide = slides[idx];
-    const btn = heroZoomButtons()[idx];
-    const img = btn?.querySelector("img") || slide?.querySelector("img");
+    const slide = heroSlides()[idx];
+    if (!slide) return null;
+    const img = slide.querySelector(".home-hero-img, img");
     if (!img) return null;
     const src = img.currentSrc || img.getAttribute("src") || img.src;
     if (!src) return null;
@@ -497,83 +492,6 @@
     return true;
   }
 
-  function heroZoomIndex(btn) {
-    const raw = btn?.getAttribute("data-hero-zoom");
-    if (raw != null && raw !== "") return Number(raw);
-    return heroIdx;
-  }
-
-  let heroZoomTapLock = 0;
-
-  function triggerHeroZoom(idx, e) {
-    if (Date.now() - heroZoomTapLock < 320) return;
-    heroZoomTapLock = Date.now();
-    if (e?.target?.closest?.(".home-hero-dot")) return;
-    e?.preventDefault?.();
-    e?.stopPropagation?.();
-    openHeroLightbox(typeof idx === "number" && !Number.isNaN(idx) ? idx : heroIdx);
-  }
-
-  function attachHeroZoomActivator(el, fixedIdx) {
-    if (!el || el.dataset.zoomTapBound === "1") return;
-    el.dataset.zoomTapBound = "1";
-    let touchStart = null;
-
-    el.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.touches.length !== 1) return;
-        touchStart = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-          t: Date.now(),
-        };
-      },
-      { passive: true },
-    );
-
-    el.addEventListener(
-      "touchend",
-      (e) => {
-        if (!touchStart) return;
-        const t = e.changedTouches[0];
-        const dx = Math.abs(t.clientX - touchStart.x);
-        const dy = Math.abs(t.clientY - touchStart.y);
-        const dt = Date.now() - touchStart.t;
-        touchStart = null;
-        if (dx > 20 || dy > 20 || dt > 800) return;
-        const idx =
-          typeof fixedIdx === "number"
-            ? fixedIdx
-            : el.classList?.contains("home-hero-zoom")
-              ? heroZoomIndex(el)
-              : heroIdx;
-        triggerHeroZoom(idx, e);
-      },
-      { passive: false },
-    );
-
-    el.addEventListener("click", (e) => {
-      const idx =
-        typeof fixedIdx === "number"
-          ? fixedIdx
-          : el.classList?.contains("home-hero-zoom")
-            ? heroZoomIndex(el)
-            : heroIdx;
-      triggerHeroZoom(idx, e);
-    });
-  }
-
-  function bindHeroZoomActivators() {
-    heroZoomButtons().forEach((btn) => {
-      attachHeroZoomActivator(btn, heroZoomIndex(btn));
-    });
-    heroSlides().forEach((slide, idx) => {
-      if (slide.querySelector(".home-hero-zoom")) return;
-      attachHeroZoomActivator(slide, idx);
-    });
-  }
-
   function mountHeroLightbox() {
     const box = $("heroLightbox");
     if (box && box.parentElement !== document.body) {
@@ -581,18 +499,9 @@
     }
   }
 
-  function bindHeroZoomTap(btn) {
-    /* legacy: per-button binding replaced by #homeHero pointer handler */
-  }
-
   function bindHeroLightbox(track) {
     mountHeroLightbox();
     bindHeroLightboxControls();
-    if (document.body.dataset.heroZoomBound === "1") return;
-    document.body.dataset.heroZoomBound = "1";
-    bindHeroZoomActivators();
-    const hero = $("homeHero");
-    if (hero) attachHeroZoomActivator(hero);
   }
 
   function bindHeroLightboxControls() {
@@ -629,12 +538,6 @@
   document.addEventListener("click", (ev) => {
     const target = ev.target;
     if (!target || typeof target.closest !== "function") return;
-
-    const zoomBtn = target.closest(".home-hero-zoom");
-    if (zoomBtn) {
-      triggerHeroZoom(heroZoomIndex(zoomBtn), ev);
-      return;
-    }
 
     const doneBtn = target.closest("#btnStyleDone, #btnFrameDone, #btnFontDone, #btnSoundDone");
     if (doneBtn) {
@@ -1824,15 +1727,13 @@
   refresh();
   setTimeout(refresh, 200);
 
-  window.__nayaHeroZoom = (e, idx) => triggerHeroZoom(idx, e);
-
   window.NayaNav = {
     openSubpage,
     closeSubpage,
     switchTab,
     navigate,
     goBack,
-    openHeroZoom: (idx) => triggerHeroZoom(typeof idx === "number" ? idx : heroIdx),
+    openHeroZoom: (idx) => openHeroLightbox(typeof idx === "number" ? idx : heroIdx),
     openDetailPick: () => openSubpage("design-detail"),
     openStylePick: () => openSubpage("design-style"),
     openFramePick: () => openSubpage("design-frame"),
