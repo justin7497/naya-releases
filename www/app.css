@@ -545,7 +545,25 @@ html, body {
   border: none;
   background: transparent;
   cursor: pointer;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
+}
+.home-hero-zoom::after {
+  content: "⊕";
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  font-size: 16px;
+  line-height: 28px;
+  text-align: center;
+  pointer-events: none;
 }
 .home-hero-zoom:active {
   opacity: 0.96;
@@ -557,7 +575,7 @@ html, body {
 .hero-lightbox {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
