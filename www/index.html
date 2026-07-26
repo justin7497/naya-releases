@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=rev6" />
+  <link rel="stylesheet" href="app.css?v=rev7" />
 </head>
 <body>
   <div class="app-shell">
@@ -55,35 +55,16 @@
         <!-- 홈 -->
         <section class="page hub is-active" id="page-home" data-page="home">
           <div class="home-hero" id="homeHero">
-            <button
-              type="button"
-              class="home-hero-zoom-btn"
-              id="homeHeroZoomBtn"
-              onclick="return window.__nayaHeroZoom&&window.__nayaHeroZoom(event)"
-              aria-label="배너 크게 보기"
-            >⊕ 크게 보기</button>
-            <button
-              type="button"
-              class="home-hero-hint"
-              id="homeHeroHint"
-              onclick="return window.__nayaHeroZoom&&window.__nayaHeroZoom(event)"
-              aria-label="배너 크게 보기"
-            >탭하여 크게 보기</button>
+            <div class="home-hero-hint" id="homeHeroHint">이미지를 탭하면 크게 보기</div>
             <div class="home-hero-track" id="homeHeroTrack">
               <div class="home-hero-slide">
-                <button type="button" class="home-hero-zoom" data-hero-zoom="0" aria-label="1번 배너 크게 보기" ontouchend="window.__nayaHeroZoom&&__nayaHeroZoom(event,0)">
-                  <img src="img/home-hero.png?v=4" alt="진짜 중요한 연락은, 깨워줄게, 나야나야! 지정한 알림만 끈질기게 증폭 알림" />
-                </button>
+                <img class="home-hero-img" data-hero-zoom="0" src="img/home-hero.png?v=4" alt="진짜 중요한 연락은, 깨워줄게, 나야나야! 지정한 알림만 끈질기게 증폭 알림" />
               </div>
               <div class="home-hero-slide">
-                <button type="button" class="home-hero-zoom" data-hero-zoom="1" aria-label="2번 배너 크게 보기" ontouchend="window.__nayaHeroZoom&&__nayaHeroZoom(event,1)">
-                  <img src="img/home-hero-guide.png?v=4" alt="나야나야 앱 사용 설명서 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시, 잠금화면 즉시 확인" />
-                </button>
+                <img class="home-hero-img" data-hero-zoom="1" src="img/home-hero-guide.png?v=4" alt="나야나야 앱 사용 설명서 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시, 잠금화면 즉시 확인" />
               </div>
               <div class="home-hero-slide">
-                <button type="button" class="home-hero-zoom" data-hero-zoom="2" aria-label="3번 배너 크게 보기" ontouchend="window.__nayaHeroZoom&&__nayaHeroZoom(event,2)">
-                  <img src="img/home-hero-painpoints.png?v=4" alt="중요 알림을 절대 놓치지 마세요 — 정보 홍수·데드line 놓침을 나야나야로 해결" />
-                </button>
+                <img class="home-hero-img" data-hero-zoom="2" src="img/home-hero-painpoints.png?v=4" alt="중요 알림을 절대 놓치지 마세요 — 정보 홍수·데드line 놓침을 나야나야로 해결" />
               </div>
             </div>
             <div class="home-hero-dots" id="homeHeroDots" aria-hidden="true">
@@ -609,8 +590,8 @@
     </div>
   </div>
 
-  <script src="hero-zoom.js?v=rev6"></script>
+  <script src="hero-zoom.js?v=rev7"></script>
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev6"></script>
+  <script src="app.js?v=rev7"></script>
 </body>
 </html>
