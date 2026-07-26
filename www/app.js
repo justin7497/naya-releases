@@ -425,7 +425,6 @@
   }
 
   let heroLightboxIdx = 0;
-  let heroSwipeMoved = false;
 
   function heroZoomButtons() {
     return [...document.querySelectorAll(".home-hero-zoom")];
@@ -460,6 +459,7 @@
   function openHeroLightbox(idx) {
     const box = $("heroLightbox");
     if (!box) return;
+    mountHeroLightbox();
     pauseHeroBriefly();
     renderHeroLightbox(idx);
     box.hidden = false;
@@ -476,39 +476,69 @@
     return true;
   }
 
+  function heroZoomIndex(btn) {
+    const raw = btn?.getAttribute("data-hero-zoom");
+    if (raw != null && raw !== "") return Number(raw);
+    return heroIdx;
+  }
+
+  function mountHeroLightbox() {
+    const box = $("heroLightbox");
+    if (box && box.parentElement !== document.body) {
+      document.body.appendChild(box);
+    }
+  }
+
+  function bindHeroZoomTap(btn) {
+    if (!btn || btn.dataset.zoomBound === "1") return;
+    btn.dataset.zoomBound = "1";
+
+    const openFromBtn = () => openHeroLightbox(heroZoomIndex(btn));
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openFromBtn();
+    });
+
+    btn.addEventListener(
+      "touchend",
+      (e) => {
+        const start = btn._heroTap;
+        btn._heroTap = null;
+        if (!start) return;
+        const t = e.changedTouches[0];
+        const dx = Math.abs(t.clientX - start.x);
+        const dy = Math.abs(t.clientY - start.y);
+        const dt = Date.now() - start.t;
+        if (dx > 28 || dy > 28 || dt > 800) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openFromBtn();
+      },
+      { passive: false },
+    );
+
+    btn.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.touches.length !== 1) return;
+        btn._heroTap = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          t: Date.now(),
+        };
+      },
+      { passive: true },
+    );
+  }
+
   function bindHeroLightbox(track) {
+    mountHeroLightbox();
     if (document.body.dataset.heroLbBound === "1") return;
     document.body.dataset.heroLbBound = "1";
 
-    track.addEventListener(
-      "touchstart",
-      (e) => {
-        heroSwipeMoved = false;
-        if (e.touches.length === 1) {
-          bindHeroLightbox._sx = e.touches[0].clientX;
-        }
-      },
-      { passive: true },
-    );
-    track.addEventListener(
-      "touchmove",
-      (e) => {
-        if (e.touches.length !== 1 || bindHeroLightbox._sx == null) return;
-        if (Math.abs(e.touches[0].clientX - bindHeroLightbox._sx) > 10) {
-          heroSwipeMoved = true;
-        }
-      },
-      { passive: true },
-    );
-
-    heroZoomButtons().forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        if (heroSwipeMoved) return;
-        e.preventDefault();
-        e.stopPropagation();
-        openHeroLightbox(Number(btn.getAttribute("data-hero-zoom") || 0));
-      });
-    });
+    heroZoomButtons().forEach(bindHeroZoomTap);
 
     $("heroLightboxClose")?.addEventListener("click", () => closeHeroLightbox());
     $("heroLightboxPrev")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx - 1));
@@ -539,6 +569,14 @@
   document.addEventListener("click", (ev) => {
     const target = ev.target;
     if (!target || typeof target.closest !== "function") return;
+
+    const zoomBtn = target.closest(".home-hero-zoom");
+    if (zoomBtn) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      openHeroLightbox(heroZoomIndex(zoomBtn));
+      return;
+    }
 
     const doneBtn = target.closest("#btnStyleDone, #btnFrameDone, #btnFontDone, #btnSoundDone");
     if (doneBtn) {
