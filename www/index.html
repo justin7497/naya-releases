@@ -7,10 +7,14 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=kakao1" />
+  <link rel="stylesheet" href="app.css?v=pull1" />
 </head>
 <body>
   <div class="app-shell">
+    <div class="pull-refresh" id="pullRefresh" aria-hidden="true">
+      <span class="pull-refresh-spinner" aria-hidden="true"></span>
+      <span class="pull-refresh-label" id="pullRefreshLabel">아래로 당겨 새로고침</span>
+    </div>
     <header class="topbar" id="topbar">
       <div class="topbar-brand">
         <img src="img/naya-logo.png" alt="" class="brand-logo" />
@@ -551,6 +555,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=0921"></script>
+  <script src="app.js?v=pull1"></script>
 </body>
 </html>
