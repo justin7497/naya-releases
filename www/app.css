@@ -69,46 +69,81 @@ html, body {
 }
 
 .pull-refresh {
-  position: absolute;
-  top: calc(var(--safe-top) + 6px);
-  left: 50%;
-  z-index: 60;
+  display: none !important;
+}
+
+.update-banner {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(25, 29, 38, 0.08);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-  transform: translate(-50%, -140%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.18s ease, opacity 0.18s ease;
+  margin: 0;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
 }
-.pull-refresh.is-visible {
-  opacity: 1;
-  transform: translate(-50%, 0);
+.update-banner[hidden] {
+  display: none !important;
 }
-.pull-refresh.is-loading .pull-refresh-spinner {
-  animation: pullSpin 0.75s linear infinite;
+.update-banner-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.pull-refresh-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #374151;
-  white-space: nowrap;
-}
-.pull-refresh-spinner {
-  width: 16px;
-  height: 16px;
+.update-banner-ic {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  border: 2px solid #d1d5db;
-  border-top-color: #2563eb;
+  background: rgba(255, 255, 255, 0.18);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 800;
   flex-shrink: 0;
 }
-@keyframes pullSpin {
-  to { transform: rotate(360deg); }
+.update-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.update-banner-text strong {
+  font-size: 13px;
+  line-height: 1.25;
+}
+.update-banner-text span {
+  font-size: 11px;
+  opacity: 0.9;
+}
+.update-banner-action {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.update-banner-dismiss {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.update-banner-action:active,
+.update-banner-dismiss:active {
+  opacity: 0.88;
 }
 
 @media (min-width: 520px) {
