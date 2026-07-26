@@ -506,6 +506,7 @@ html, body {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  touch-action: pan-x;
 }
 .home-hero-track::-webkit-scrollbar { display: none; }
 .home-hero-slide {
@@ -573,7 +574,7 @@ html, body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 .home-hero-zoom::after {
   content: "⊕";
@@ -597,6 +598,9 @@ html, body {
   pointer-events: none;
 }
 
+body.hero-lb-open {
+  overflow: hidden;
+}
 .hero-lightbox {
   position: fixed;
   inset: 0;
