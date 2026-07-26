@@ -1,6 +1,6 @@
 {
-  "versionCode": 44,
-  "versionName": "0.9.26",
-  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.26/naya.apk",
-  "releaseNotes": "Brand voice: TTS and default sound now say 나야나야"
+  "versionCode": 45,
+  "versionName": "0.9.27",
+  "apkUrl": "https://github.com/justin7497/naya-releases/releases/download/v0.9.27/naya.apk",
+  "releaseNotes": "New 나야나야 bell app icon (high-res launcher + in-app logo)"
 }
