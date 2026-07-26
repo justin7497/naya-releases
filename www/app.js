@@ -490,60 +490,52 @@
   }
 
   function bindHeroZoomTap(btn) {
-    if (!btn || btn.dataset.zoomBound === "1") return;
-    btn.dataset.zoomBound = "1";
-
-    const openFromBtn = () => openHeroLightbox(heroZoomIndex(btn));
-
-    btn.addEventListener("click", (e) => {
-      if (btn._heroTapConsumed) {
-        btn._heroTapConsumed = false;
-        return;
-      }
-      e.preventDefault();
-      e.stopPropagation();
-      openFromBtn();
-    });
-
-    btn.addEventListener(
-      "touchend",
-      (e) => {
-        const start = btn._heroTap;
-        btn._heroTap = null;
-        if (!start) return;
-        const t = e.changedTouches[0];
-        const dx = Math.abs(t.clientX - start.x);
-        const dy = Math.abs(t.clientY - start.y);
-        const dt = Date.now() - start.t;
-        if (dx > 28 || dy > 28 || dt > 800) return;
-        e.preventDefault();
-        e.stopPropagation();
-        btn._heroTapConsumed = true;
-        openFromBtn();
-      },
-      { passive: false },
-    );
-
-    btn.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.touches.length !== 1) return;
-        btn._heroTap = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-          t: Date.now(),
-        };
-      },
-      { passive: true },
-    );
+    /* legacy: per-button binding replaced by #homeHero pointer handler */
   }
 
   function bindHeroLightbox(track) {
     mountHeroLightbox();
-    if (document.body.dataset.heroLbBound === "1") return;
-    document.body.dataset.heroLbBound = "1";
+    const hero = $("homeHero");
+    if (!hero || hero.dataset.zoomBound === "1") {
+      bindHeroLightboxControls();
+      return;
+    }
+    hero.dataset.zoomBound = "1";
 
-    heroZoomButtons().forEach(bindHeroZoomTap);
+    let tapStart = null;
+    hero.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        tapStart = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId };
+      },
+      { passive: true },
+    );
+    hero.addEventListener(
+      "pointerup",
+      (e) => {
+        if (!tapStart || e.pointerId !== tapStart.id) return;
+        const dx = Math.abs(e.clientX - tapStart.x);
+        const dy = Math.abs(e.clientY - tapStart.y);
+        const dt = Date.now() - tapStart.t;
+        tapStart = null;
+        if (e.target.closest(".home-hero-dot")) return;
+        if (dx > 26 || dy > 26 || dt > 900) return;
+        const btn = e.target.closest(".home-hero-zoom");
+        const idx = btn ? heroZoomIndex(btn) : heroIdx;
+        e.preventDefault();
+        e.stopPropagation();
+        openHeroLightbox(idx);
+      },
+      { passive: false },
+    );
+
+    bindHeroLightboxControls();
+  }
+
+  function bindHeroLightboxControls() {
+    if (document.body.dataset.heroLbControls === "1") return;
+    document.body.dataset.heroLbControls = "1";
 
     $("heroLightboxClose")?.addEventListener("click", () => closeHeroLightbox());
     $("heroLightboxPrev")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx - 1));
@@ -1707,6 +1699,7 @@
     switchTab,
     navigate,
     goBack,
+    openHeroZoom: (idx) => openHeroLightbox(typeof idx === "number" ? idx : heroIdx),
     openDetailPick: () => openSubpage("design-detail"),
     openStylePick: () => openSubpage("design-style"),
     openFramePick: () => openSubpage("design-frame"),
