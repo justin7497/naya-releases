@@ -15,7 +15,7 @@
 
   const designState = {
     themeSet: "classic",
-    themeStyle: "siren_classic",
+    themeStyle: "kakao_talk",
     themeFrame: "thick",
     themeFont: "giant",
     themeSound: "naya",
@@ -30,11 +30,11 @@
     sets: [
       {
         id: "classic",
-        label: "클래식 사이렌",
-        desc: "딤 배경 위 중앙 카드 + 테두리 점멸",
-        defaultStyle: "siren_classic",
-        defaultFrame: "card",
-        defaultFont: "giant",
+        label: "카카오톡 스타일",
+        desc: "채팅방 노란 말풍선 알림",
+        defaultStyle: "kakao_talk",
+        defaultFrame: "rounded",
+        defaultFont: "rounded",
       },
       {
         id: "laser_scan",
@@ -54,6 +54,7 @@
       },
     ],
     styles: [
+      { id: "kakao_talk", label: "카카오톡" },
       { id: "siren_classic", label: "사이렌 레드" },
       { id: "amber_alert", label: "선셋 경고" },
       { id: "neon_night", label: "네온 시티" },
@@ -94,7 +95,7 @@
       { id: "display", label: "디스플레이" },
     ],
     sounds: [
-      { id: "naya", label: "나야" },
+      { id: "naya", label: "나야나야" },
       { id: "ding", label: "딩동" },
       { id: "siren", label: "사이렌" },
       { id: "alarm", label: "알람음" },
@@ -103,6 +104,7 @@
   };
 
   const THEME_SWATCH = {
+    kakao_talk: ["#fee500", "#f5dc00"],
     siren_classic: ["#ef4444", "#3b82f6"],
     amber_alert: ["#f59e0b", "#ef4444"],
     neon_night: ["#ec4899", "#22d3ee"],
@@ -116,6 +118,7 @@
   };
 
   const STYLE_TAG = {
+    kakao_talk: "카톡",
     siren_classic: "클래식",
     amber_alert: "경고",
     neon_night: "트렌드",
@@ -128,7 +131,7 @@
     cyber_lime: "사이버",
   };
 
-  const STYLE_CLASSIC = ["siren_classic", "amber_alert", "police", "soft_day"];
+  const STYLE_CLASSIC = ["kakao_talk", "siren_classic", "amber_alert", "police", "soft_day"];
   const STYLE_TREND = [
     "neon_night",
     "glass_mint",
@@ -1271,7 +1274,7 @@
 
     const ver = st.versionName || "—";
     const uiTag = st.webUiSource === "remote" ? " · UI 원격" : "";
-    if ($("versionLabel")) $("versionLabel").textContent = `나야 (NaYa) ${ver}${uiTag}`;
+    if ($("versionLabel")) $("versionLabel").textContent = `나야나야 ${ver}${uiTag}`;
     if ($("versionShort")) $("versionShort").textContent = `v${ver}`;
 
     const listenerOk = !!st.listenerGranted;
@@ -1286,7 +1289,7 @@
     if (top) {
       top.classList.toggle("is-on", ready);
       top.classList.toggle("is-off", !ready);
-      top.setAttribute("aria-label", ready ? "나야 작동 중 ON" : "나야 꺼짐 OFF · 시작하기로 이동");
+      top.setAttribute("aria-label", ready ? "나야나야 작동 중 ON" : "나야나야 꺼짐 OFF · 시작하기로 이동");
     }
     if (topLabel) topLabel.textContent = ready ? "ON" : "OFF";
 
