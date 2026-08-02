@@ -2383,6 +2383,27 @@ input[type="number"]:focus, textarea:focus {
 .rule-actions-status {
   grid-template-columns: 1fr 1fr 1fr;
 }
+.rule-actions-two {
+  grid-template-columns: 1fr 1fr;
+}
+.archive-section-title {
+  margin: 18px 0 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+.archive-section-title:first-of-type {
+  margin-top: 4px;
+}
+.archive-rules-list {
+  margin-bottom: 4px;
+}
+.pill.deleted {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
 .rule-card--paused {
   opacity: 0.72;
   background: #f3f4f6;
