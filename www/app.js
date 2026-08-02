@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 12;
+  const WEB_UI_REVISION = 13;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1405,12 +1405,13 @@
     const crit = rule.level === "CRITICAL";
     const avatarDataUrl = ruleAvatarDataUrl(rule);
     const actions = mode === "deleted"
-      ? `<div class="rule-actions rule-actions-status">
+      ? `<div class="rule-actions rule-actions-status rule-actions-two">
            <button type="button" class="btn primary btn-restore-rule" data-id="${escapeHtml(rule.id)}">활성</button>
-           <button type="button" class="btn ghost btn-purge-rule" data-id="${escapeHtml(rule.id)}">영구 삭제</button>
+           <button type="button" class="btn ghost btn-purge-rule" data-id="${escapeHtml(rule.id)}">완전삭제</button>
          </div>`
-      : `<div class="rule-actions">
+      : `<div class="rule-actions rule-actions-status rule-actions-two">
            <button type="button" class="btn primary btn-restore-rule" data-id="${escapeHtml(rule.id)}">활성</button>
+           <button type="button" class="btn ghost btn-archive-delete" data-id="${escapeHtml(rule.id)}">삭제</button>
          </div>`;
     return `
       <div class="rule-card rule-card--paused">
@@ -1433,11 +1434,19 @@
         restoreWatchRule(btn.getAttribute("data-id"));
       });
     });
+    scope.querySelectorAll(".btn-archive-delete").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!window.confirm("삭제 목록으로 옮길까요?")) return;
+        const result = parseJson(call("removeWatchRule", btn.getAttribute("data-id")), { ok: false });
+        toast(result.message || (result.ok ? "삭제 목록으로 이동됨" : "실패"), "archiveMsg");
+        if (result.ok) refresh();
+      });
+    });
     scope.querySelectorAll(".btn-purge-rule").forEach((btn) => {
       btn.addEventListener("click", () => {
-        if (!window.confirm("영구 삭제할까요? 복구할 수 없습니다.")) return;
+        if (!window.confirm("완전 삭제할까요? 복구할 수 없습니다.")) return;
         const result = parseJson(call("purgeWatchRule", btn.getAttribute("data-id")), { ok: false });
-        toast(result.message || (result.ok ? "영구 삭제됨" : "실패"), "archiveMsg");
+        toast(result.message || (result.ok ? "완전 삭제됨" : "실패"), "archiveMsg");
         if (result.ok) refresh();
       });
     });
