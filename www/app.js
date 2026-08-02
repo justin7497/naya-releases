@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 11;
+  const WEB_UI_REVISION = 12;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -286,6 +286,12 @@
         }
         if (sub === "rule-alert") renderRuleAlertEditor();
         if (sub === "app-add") loadInstalledApps();
+        if (sub === "notif-link") {
+          renderLinkAppPicker(cachedAppPresets);
+          if (!$("notifLinkResults")?.children?.length) {
+            renderNotifLinkResults([], "검색 결과");
+          }
+        }
       } catch (err) {
         console.error("applyState render error:", sub, err);
       }
@@ -1150,6 +1156,129 @@
     if ($("recentCount")) $("recentCount").textContent = `${(items || []).length}건`;
   }
 
+  let linkSelectedPackage = "";
+  let cachedAppPresets = [];
+
+  function renderLinkAppPicker(apps) {
+    const box = $("linkAppPicker");
+    if (!box) return;
+    const enabled = (apps || []).filter((app) => app.enabled);
+    cachedAppPresets = apps || [];
+    box.innerHTML = "";
+    if (!enabled.length) {
+      box.innerHTML = '<p class="empty-hint">감시할 앱을 먼저 선택하세요.</p>';
+      linkSelectedPackage = "";
+      return;
+    }
+    if (!linkSelectedPackage || !enabled.some((app) => app.packageName === linkSelectedPackage)) {
+      linkSelectedPackage = enabled[0].packageName;
+    }
+    enabled.forEach((app) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `link-app-chip${app.packageName === linkSelectedPackage ? " selected" : ""}`;
+      btn.textContent = app.label;
+      btn.dataset.package = app.packageName;
+      btn.addEventListener("click", () => {
+        linkSelectedPackage = app.packageName;
+        renderLinkAppPicker(cachedAppPresets);
+      });
+      box.appendChild(btn);
+    });
+  }
+
+  function notifLinkCardHtml(n) {
+    const title = n.title || "";
+    return `<div class="recent-card">
+      <div class="recent-card-top">
+        <div class="recent-card-meta">
+          <div class="app">${escapeHtml(n.appLabel || n.packageName)}</div>
+          <div class="title">${escapeHtml(title || "(제목 없음)")}</div>
+        </div>
+      </div>
+      <div class="body">${escapeHtml(n.body || "")}</div>
+      <div class="recent-actions recent-actions-status link-result-actions">
+        <button type="button" class="btn primary btn-link-register" data-package="${escapeHtml(n.packageName)}" data-title="${escapeHtml(title)}" data-enabled="true">활성</button>
+        <button type="button" class="btn ghost btn-link-register" data-package="${escapeHtml(n.packageName)}" data-title="${escapeHtml(title)}" data-enabled="false">비활성</button>
+      </div>
+    </div>`;
+  }
+
+  function bindNotifLinkResults(scope) {
+    scope.querySelectorAll(".btn-link-register").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        registerFromLink(
+          btn.getAttribute("data-package"),
+          btn.getAttribute("data-title"),
+          btn.getAttribute("data-enabled") !== "false",
+        );
+      });
+    });
+  }
+
+  function registerFromLink(packageName, matchTitle, enabled) {
+    const title = String(matchTitle || "").trim();
+    if (!packageName || !title) {
+      toast("앱과 대상 이름을 확인하세요", "notifLinkMsg");
+      return;
+    }
+    const payload = JSON.stringify({
+      packageName,
+      matchTitle: title,
+      level: "NORMAL",
+      enabled,
+    });
+    const result = parseJson(call("registerFromNotification", payload), { ok: false });
+    toast(result.message || (result.ok ? "등록되었습니다" : "실패"), "notifLinkMsg");
+    if (result.ok) refresh();
+  }
+
+  function renderNotifLinkResults(items, title) {
+    const box = $("notifLinkResults");
+    const titleEl = $("notifLinkResultsTitle");
+    if (titleEl) titleEl.textContent = title || "검색 결과";
+    if (!box) return;
+    if (!items || !items.length) {
+      box.innerHTML = '<p class="empty-hint">표시할 항목이 없습니다.</p>';
+      return;
+    }
+    box.innerHTML = items.map((n) => notifLinkCardHtml(n)).join("");
+    bindNotifLinkResults(box);
+  }
+
+  function scanActiveLinkNotifications() {
+    if (!linkSelectedPackage) {
+      toast("앱을 선택하세요", "notifLinkMsg");
+      return;
+    }
+    const payload = JSON.stringify({ packageName: linkSelectedPackage });
+    const result = parseJson(call("scanActiveNotifications", payload), { ok: false, items: [] });
+    const items = result.items || [];
+    toast(result.message || (result.ok ? "스캔 완료" : "스캔 실패"), "notifLinkMsg");
+    renderNotifLinkResults(items, `알림창 스캔 (${items.length}건)`);
+  }
+
+  function searchNotificationLog() {
+    const query = ($("notifLogSearch")?.value || "").trim();
+    const payload = JSON.stringify({
+      query,
+      packageName: linkSelectedPackage || "",
+    });
+    const result = parseJson(call("searchNotificationLog", payload), { ok: false, items: [] });
+    const items = result.items || [];
+    toast(result.message || (result.ok ? "검색 완료" : "검색 실패"), "notifLinkMsg");
+    renderNotifLinkResults(items, `수신 기록 (${items.length}건)`);
+  }
+
+  function openLinkApp() {
+    if (!linkSelectedPackage) {
+      toast("앱을 선택하세요", "notifLinkMsg");
+      return;
+    }
+    const result = parseJson(call("openWatchedApp", linkSelectedPackage), { ok: false });
+    toast(result.message || (result.ok ? "앱을 엽니다" : "실패"), "notifLinkMsg");
+  }
+
   function openRuleAlertEditor(ruleId) {
     const rule = currentRules.find((item) => item.id === ruleId);
     if (!rule) return;
@@ -1564,6 +1693,13 @@
 
     renderRecent(st.recentNotifications || parseJson(call("getRecentNotifications"), []));
     renderRules(st.watchRules || parseJson(call("getWatchRules"), []));
+    cachedAppPresets = st.appPresets || [];
+    renderLinkAppPicker(cachedAppPresets);
+    if ($("notifLinkHint")) {
+      $("notifLinkHint").textContent = cachedAppPresets.filter((app) => app.enabled).length
+        ? "스캔·검색"
+        : "앱 선택 필요";
+    }
   }
 
   function applyUpdateNotice(st) {
@@ -1718,6 +1854,19 @@
       }, 350);
     }
   });
+  $("btnOpenLinkApp")?.addEventListener("click", openLinkApp);
+  $("btnScanActive")?.addEventListener("click", scanActiveLinkNotifications);
+  $("btnSearchLog")?.addEventListener("click", searchNotificationLog);
+  $("notifLogSearch")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") searchNotificationLog();
+  });
+  $("btnManualRegisterActive")?.addEventListener("click", () => {
+    registerFromLink(linkSelectedPackage, $("manualMatchTitle")?.value, true);
+  });
+  $("btnManualRegisterInactive")?.addEventListener("click", () => {
+    registerFromLink(linkSelectedPackage, $("manualMatchTitle")?.value, false);
+  });
+
   $("btnPickRuleAvatar")?.addEventListener("click", () => {
     if (!currentRuleId) return;
     call("pickRuleAvatar", currentRuleId);
@@ -1807,6 +1956,16 @@
   window.NotiSirenWeb = {
     onResume: refresh,
     onUpdateAvailable: refresh,
+    onAppLinkReturn: (packageName) => {
+      if (packageName) linkSelectedPackage = packageName;
+      renderLinkAppPicker(cachedAppPresets);
+      if (currentSub === "notif-link") {
+        toast("앱에서 돌아왔습니다. 알림창을 스캔합니다", "notifLinkMsg");
+        scanActiveLinkNotifications();
+      } else {
+        refresh();
+      }
+    },
     onAvatarPicked: (ruleId, saved) => {
       refresh();
       if (ruleId === currentRuleId) {
