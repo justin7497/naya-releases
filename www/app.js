@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 10;
+  const WEB_UI_REVISION = 11;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1244,6 +1244,18 @@
     });
   }
 
+  function isRuleDeleted(rule) {
+    return Number(rule?.deletedAt || 0) > 0;
+  }
+
+  function isRuleActive(rule) {
+    return rule?.enabled !== false && !isRuleDeleted(rule);
+  }
+
+  function isRuleInactive(rule) {
+    return rule?.enabled === false && !isRuleDeleted(rule);
+  }
+
   function setRuleEnabled(ruleId, enabled) {
     const payload = JSON.stringify({ id: ruleId, enabled });
     const result = parseJson(call("updateWatchRule", payload), { ok: false });
@@ -1254,28 +1266,107 @@
     if (result.ok) refresh();
   }
 
+  function restoreWatchRule(ruleId) {
+    const result = parseJson(call("restoreWatchRule", ruleId), { ok: false });
+    toast(result.message || (result.ok ? "활성화되었습니다" : "실패"), "archiveMsg");
+    if (result.ok) refresh();
+  }
+
+  function renderArchiveRuleCard(rule, mode) {
+    const crit = rule.level === "CRITICAL";
+    const avatarDataUrl = ruleAvatarDataUrl(rule);
+    const actions = mode === "deleted"
+      ? `<div class="rule-actions rule-actions-status">
+           <button type="button" class="btn primary btn-restore-rule" data-id="${escapeHtml(rule.id)}">활성</button>
+           <button type="button" class="btn ghost btn-purge-rule" data-id="${escapeHtml(rule.id)}">영구 삭제</button>
+         </div>`
+      : `<div class="rule-actions">
+           <button type="button" class="btn primary btn-restore-rule" data-id="${escapeHtml(rule.id)}">활성</button>
+         </div>`;
+    return `
+      <div class="rule-card rule-card--paused">
+        <div class="rule-card-head">
+          ${ruleAvatarHtml(rule, avatarDataUrl)}
+          <div class="rule-card-meta">
+            <div class="app">${escapeHtml(rule.appLabel || rule.packageName)}</div>
+            <div class="title">${escapeHtml(rule.matchTitle)}</div>
+            <span class="pill ${mode === "deleted" ? "deleted" : "paused"}">${mode === "deleted" ? "삭제됨" : "비활성"}</span>
+            <span class="pill ${crit ? "crit" : ""}">${crit ? "초긴급" : "일반"}</span>
+          </div>
+        </div>
+        ${actions}
+      </div>`;
+  }
+
+  function bindArchiveRuleActions(scope) {
+    scope.querySelectorAll(".btn-restore-rule").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        restoreWatchRule(btn.getAttribute("data-id"));
+      });
+    });
+    scope.querySelectorAll(".btn-purge-rule").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!window.confirm("영구 삭제할까요? 복구할 수 없습니다.")) return;
+        const result = parseJson(call("purgeWatchRule", btn.getAttribute("data-id")), { ok: false });
+        toast(result.message || (result.ok ? "영구 삭제됨" : "실패"), "archiveMsg");
+        if (result.ok) refresh();
+      });
+    });
+  }
+
+  function renderArchivedRules(rules) {
+    const inactiveBox = $("inactiveRulesList");
+    const deletedBox = $("deletedRulesList");
+    if (!inactiveBox || !deletedBox) return;
+
+    const all = rules || [];
+    const inactive = all.filter(isRuleInactive);
+    const deleted = all.filter(isRuleDeleted);
+
+    if ($("archiveCountHint")) {
+      const total = inactive.length + deleted.length;
+      if (!total) $("archiveCountHint").textContent = "없음";
+      else {
+        const parts = [];
+        if (inactive.length) parts.push(`비활성 ${inactive.length}`);
+        if (deleted.length) parts.push(`삭제 ${deleted.length}`);
+        $("archiveCountHint").textContent = parts.join(" · ");
+      }
+    }
+
+    inactiveBox.innerHTML = inactive.length
+      ? inactive.map((r) => renderArchiveRuleCard(r, "inactive")).join("")
+      : '<p class="empty-hint">비활성 대상이 없습니다.</p>';
+    deletedBox.innerHTML = deleted.length
+      ? deleted.map((r) => renderArchiveRuleCard(r, "deleted")).join("")
+      : '<p class="empty-hint">삭제된 대상이 없습니다.</p>';
+
+    bindArchiveRuleActions(inactiveBox);
+    bindArchiveRuleActions(deletedBox);
+  }
+
   function renderRules(rules) {
     const box = $("rulesList");
     if (!box) return;
-    currentRules = rules || [];
+    currentRules = (rules || []).filter((r) => !isRuleDeleted(r));
+    const activeRules = currentRules.filter(isRuleActive);
     box.innerHTML = "";
-    const count = currentRules.length;
-    const activeCount = currentRules.filter((r) => r.enabled !== false).length;
-    const pausedCount = count - activeCount;
-    if ($("rulesCount")) $("rulesCount").textContent = `${activeCount}명`;
+    const count = activeRules.length;
+    const pausedCount = currentRules.filter(isRuleInactive).length;
+    if ($("rulesCount")) $("rulesCount").textContent = `${count}명`;
     if ($("rulesCountHint")) {
-      if (!count) $("rulesCountHint").textContent = "대상 관리";
-      else if (pausedCount) $("rulesCountHint").textContent = `${count}명 · ${pausedCount}명 일시정지`;
+      if (!count && !pausedCount) $("rulesCountHint").textContent = "대상 관리";
+      else if (pausedCount) $("rulesCountHint").textContent = `${count}명 활성 · 비활성 ${pausedCount}`;
       else $("rulesCountHint").textContent = `${count}명 등록`;
     }
     if (!count) {
       box.innerHTML = '<p class="empty-hint">등록된 대상이 없습니다.</p>';
+      renderArchivedRules(rules);
       return;
     }
-    currentRules.forEach((r) => {
+    activeRules.forEach((r) => {
       const card = document.createElement("div");
-      const enabled = r.enabled !== false;
-      card.className = enabled ? "rule-card" : "rule-card rule-card--paused";
+      card.className = "rule-card";
       const crit = r.level === "CRITICAL";
       const avatarDataUrl = ruleAvatarDataUrl(r);
       const soundLabel = r.soundId
@@ -1287,14 +1378,13 @@
           <div class="rule-card-meta">
             <div class="app">${escapeHtml(r.appLabel || r.packageName)}</div>
             <div class="title">${escapeHtml(r.matchTitle)}</div>
-            <span class="pill ${enabled ? "" : "paused"}">${enabled ? "활성" : "비활성"}</span>
+            <span class="pill">활성</span>
             <span class="pill ${crit ? "crit" : ""}">${crit ? "초긴급" : "일반"}</span>
             <span class="pill rule-sound">${escapeHtml(soundLabel)}</span>
           </div>
         </div>
-        <div class="rule-actions rule-actions-status">
-          <button type="button" class="btn ${enabled ? "primary" : "ghost"} btn-rule-enable" data-id="${escapeHtml(r.id)}" ${enabled ? "disabled" : ""}>활성</button>
-          <button type="button" class="btn ${enabled ? "ghost" : "primary"} btn-rule-disable" data-id="${escapeHtml(r.id)}" ${enabled ? "" : "disabled"}>비활성</button>
+        <div class="rule-actions rule-actions-status rule-actions-two">
+          <button type="button" class="btn ghost btn-rule-disable" data-id="${escapeHtml(r.id)}">비활성</button>
           <button type="button" class="btn ghost btn-del-rule" data-id="${escapeHtml(r.id)}">삭제</button>
         </div>
         <div class="rule-actions">
@@ -1307,11 +1397,6 @@
         openRuleAlertEditor(btn.getAttribute("data-id"));
       });
     });
-    box.querySelectorAll(".btn-rule-enable").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        setRuleEnabled(btn.getAttribute("data-id"), true);
-      });
-    });
     box.querySelectorAll(".btn-rule-disable").forEach((btn) => {
       btn.addEventListener("click", () => {
         setRuleEnabled(btn.getAttribute("data-id"), false);
@@ -1319,12 +1404,13 @@
     });
     box.querySelectorAll(".btn-del-rule").forEach((btn) => {
       btn.addEventListener("click", () => {
-        if (!window.confirm("등록을 삭제할까요? 다시 알림을 받으려면 최근 알림에서 다시 등록해야 합니다.")) return;
+        if (!window.confirm("삭제 목록으로 옮길까요? 설정에서 다시 활성화할 수 있습니다.")) return;
         const result = parseJson(call("removeWatchRule", btn.getAttribute("data-id")), { ok: false });
-        toast(result.message || "삭제됨", "targetsMsg");
+        toast(result.message || "삭제 목록으로 이동됨", "targetsMsg");
         refresh();
       });
     });
+    renderArchivedRules(rules);
     if (currentSub === "rule-alert") renderRuleAlertEditor();
   }
 
