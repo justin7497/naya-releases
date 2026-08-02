@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=rev11" />
+  <link rel="stylesheet" href="app.css?v=rev12" />
 </head>
 <body>
   <div class="app-shell">
@@ -107,6 +107,14 @@
               <span class="menu-text">
                 <span class="menu-label">최근 알림에서 등록</span>
                 <span class="menu-meta" id="recentCount">0건</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="notif-link">
+              <span class="menu-ic mi-search"></span>
+              <span class="menu-text">
+                <span class="menu-label">알림 찾아 연결</span>
+                <span class="menu-meta" id="notifLinkHint">스캔·검색</span>
               </span>
               <span class="menu-chevron">›</span>
             </button>
@@ -258,6 +266,36 @@
           <div id="recentList" class="recent-list"></div>
           <button type="button" class="btn ghost block" data-action="clearRecent">목록 비우기</button>
           <p id="filtersMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-notif-link" data-sub="notif-link">
+          <p class="sub-lead">앱을 열어 확인한 뒤 알림 스캔하거나, 수신 기록·이름으로 연결합니다.</p>
+
+          <p class="rule-setting-title">앱 선택</p>
+          <div id="linkAppPicker" class="link-app-picker" role="listbox" aria-label="연결할 앱 선택"></div>
+
+          <div class="link-action-row">
+            <button type="button" class="btn primary" id="btnOpenLinkApp">앱에서 찾기</button>
+            <button type="button" class="btn ghost" id="btnScanActive">알림 스캔</button>
+          </div>
+
+          <p class="rule-setting-title">수신 기록 검색</p>
+          <label class="app-search">
+            <span class="app-search-icon" aria-hidden="true">⌕</span>
+            <input type="search" id="notifLogSearch" placeholder="이름·내용 검색" autocomplete="off" />
+          </label>
+          <button type="button" class="btn ghost block" id="btnSearchLog">기록 검색</button>
+
+          <p class="rule-setting-title">이름 직접 입력</p>
+          <input type="text" id="manualMatchTitle" class="text-input block" placeholder="알림에 보이는 상대 이름" autocomplete="off" />
+          <div class="recent-actions recent-actions-status rule-actions-two link-manual-actions">
+            <button type="button" class="btn primary" id="btnManualRegisterActive">활성 등록</button>
+            <button type="button" class="btn ghost" id="btnManualRegisterInactive">비활성 등록</button>
+          </div>
+
+          <p class="rule-setting-title" id="notifLinkResultsTitle">검색 결과</p>
+          <div id="notifLinkResults" class="recent-list"></div>
+          <p id="notifLinkMsg" class="hint feedback"></p>
         </section>
 
         <section class="subpage scroll" id="sub-targets" data-sub="targets">
@@ -609,8 +647,8 @@
     </div>
   </div>
 
-  <script src="hero-zoom.js?v=rev11"></script>
+  <script src="hero-zoom.js?v=rev12"></script>
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev11"></script>
+  <script src="app.js?v=rev12"></script>
 </body>
 </html>
