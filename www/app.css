@@ -2380,11 +2380,29 @@ input[type="number"]:focus, textarea:focus {
   gap: 8px;
   margin-top: 12px;
 }
+.rule-actions-status {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.rule-card--paused {
+  opacity: 0.72;
+  background: #f3f4f6;
+}
+.rule-card--paused .rule-avatar-thumb {
+  filter: grayscale(0.35);
+}
+.pill.paused {
+  background: #f3f4f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
 .recent-actions {
   width: 100%;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+.recent-actions-status {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 .recent-actions .btn {
   min-width: 0;
