@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 8;
+  const WEB_UI_REVISION = 10;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1092,12 +1092,12 @@
              <div class="app">${escapeHtml(n.appLabel || n.packageName)}</div>
              <div class="title">${escapeHtml(n.title || "(제목 없음)")}</div>
            </div>
-           <button type="button" class="recent-delete btn-del-recent" data-id="${escapeHtml(n.id)}" aria-label="이 알림 삭제">삭제</button>
          </div>
          <div class="body">${escapeHtml(n.body || "")}</div>
-         <div class="recent-actions">
-           <button type="button" class="btn primary btn-add-rule" data-id="${escapeHtml(n.id)}" data-level="NORMAL">등록</button>
-           <button type="button" class="btn ghost btn-add-rule" data-id="${escapeHtml(n.id)}" data-level="CRITICAL">초긴급</button>
+         <div class="recent-actions recent-actions-status">
+           <button type="button" class="btn primary btn-add-rule" data-id="${escapeHtml(n.id)}" data-enabled="true">활성</button>
+           <button type="button" class="btn ghost btn-add-rule" data-id="${escapeHtml(n.id)}" data-enabled="false">비활성</button>
+           <button type="button" class="btn ghost btn-del-recent" data-id="${escapeHtml(n.id)}">삭제</button>
          </div>`
       : `
          <div class="app">${escapeHtml(n.appLabel || n.packageName)}</div>
@@ -1111,7 +1111,8 @@
       btn.addEventListener("click", () => {
         const payload = JSON.stringify({
           recentId: btn.getAttribute("data-id"),
-          level: btn.getAttribute("data-level"),
+          level: "NORMAL",
+          enabled: btn.getAttribute("data-enabled") !== "false",
         });
         const result = parseJson(call("addRuleFromRecent", payload), { ok: false, message: "등록 실패" });
         toast(result.message || (result.ok ? "등록되었습니다" : "실패"), "filtersMsg");
@@ -1243,21 +1244,38 @@
     });
   }
 
+  function setRuleEnabled(ruleId, enabled) {
+    const payload = JSON.stringify({ id: ruleId, enabled });
+    const result = parseJson(call("updateWatchRule", payload), { ok: false });
+    toast(
+      result.message || (enabled ? "활성화되었습니다" : "일시 정지되었습니다"),
+      "targetsMsg",
+    );
+    if (result.ok) refresh();
+  }
+
   function renderRules(rules) {
     const box = $("rulesList");
     if (!box) return;
     currentRules = rules || [];
     box.innerHTML = "";
     const count = currentRules.length;
-    if ($("rulesCount")) $("rulesCount").textContent = `${count}명`;
-    if ($("rulesCountHint")) $("rulesCountHint").textContent = count ? `${count}명 등록` : "대상 관리";
+    const activeCount = currentRules.filter((r) => r.enabled !== false).length;
+    const pausedCount = count - activeCount;
+    if ($("rulesCount")) $("rulesCount").textContent = `${activeCount}명`;
+    if ($("rulesCountHint")) {
+      if (!count) $("rulesCountHint").textContent = "대상 관리";
+      else if (pausedCount) $("rulesCountHint").textContent = `${count}명 · ${pausedCount}명 일시정지`;
+      else $("rulesCountHint").textContent = `${count}명 등록`;
+    }
     if (!count) {
       box.innerHTML = '<p class="empty-hint">등록된 대상이 없습니다.</p>';
       return;
     }
     currentRules.forEach((r) => {
       const card = document.createElement("div");
-      card.className = "rule-card";
+      const enabled = r.enabled !== false;
+      card.className = enabled ? "rule-card" : "rule-card rule-card--paused";
       const crit = r.level === "CRITICAL";
       const avatarDataUrl = ruleAvatarDataUrl(r);
       const soundLabel = r.soundId
@@ -1269,13 +1287,18 @@
           <div class="rule-card-meta">
             <div class="app">${escapeHtml(r.appLabel || r.packageName)}</div>
             <div class="title">${escapeHtml(r.matchTitle)}</div>
+            <span class="pill ${enabled ? "" : "paused"}">${enabled ? "활성" : "비활성"}</span>
             <span class="pill ${crit ? "crit" : ""}">${crit ? "초긴급" : "일반"}</span>
             <span class="pill rule-sound">${escapeHtml(soundLabel)}</span>
           </div>
         </div>
+        <div class="rule-actions rule-actions-status">
+          <button type="button" class="btn ${enabled ? "primary" : "ghost"} btn-rule-enable" data-id="${escapeHtml(r.id)}" ${enabled ? "disabled" : ""}>활성</button>
+          <button type="button" class="btn ${enabled ? "ghost" : "primary"} btn-rule-disable" data-id="${escapeHtml(r.id)}" ${enabled ? "" : "disabled"}>비활성</button>
+          <button type="button" class="btn ghost btn-del-rule" data-id="${escapeHtml(r.id)}">삭제</button>
+        </div>
         <div class="rule-actions">
           <button type="button" class="btn primary btn-edit-rule-alert" data-id="${escapeHtml(r.id)}">알림 설정</button>
-          <button type="button" class="btn ghost btn-del-rule" data-id="${escapeHtml(r.id)}">삭제</button>
         </div>`;
       box.appendChild(card);
     });
@@ -1284,10 +1307,21 @@
         openRuleAlertEditor(btn.getAttribute("data-id"));
       });
     });
+    box.querySelectorAll(".btn-rule-enable").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setRuleEnabled(btn.getAttribute("data-id"), true);
+      });
+    });
+    box.querySelectorAll(".btn-rule-disable").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setRuleEnabled(btn.getAttribute("data-id"), false);
+      });
+    });
     box.querySelectorAll(".btn-del-rule").forEach((btn) => {
       btn.addEventListener("click", () => {
+        if (!window.confirm("등록을 삭제할까요? 다시 알림을 받으려면 최근 알림에서 다시 등록해야 합니다.")) return;
         const result = parseJson(call("removeWatchRule", btn.getAttribute("data-id")), { ok: false });
-        toast(result.message || "삭제됨", "filtersMsg");
+        toast(result.message || "삭제됨", "targetsMsg");
         refresh();
       });
     });
