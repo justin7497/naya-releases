@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#fee500" />
   <title>나야나야</title>
   <link rel="icon" type="image/png" href="img/naya-logo.png" />
-  <link rel="stylesheet" href="app.css?v=rev8" />
+  <link rel="stylesheet" href="app.css?v=rev10" />
 </head>
 <body>
   <div class="app-shell">
@@ -246,14 +246,16 @@
         </section>
 
         <section class="subpage scroll" id="sub-recent" data-sub="recent">
-          <p class="sub-lead">탭해서 감시 대상으로 등록하세요.</p>
+          <p class="sub-lead">활성은 바로 알림을 받고, 비활성은 등록만 해두고 일시 정지합니다.</p>
           <div id="recentList" class="recent-list"></div>
           <button type="button" class="btn ghost block" data-action="clearRecent">목록 비우기</button>
           <p id="filtersMsg" class="hint feedback"></p>
         </section>
 
         <section class="subpage scroll" id="sub-targets" data-sub="targets">
+          <p class="sub-lead">비활성은 일시 정지입니다. 삭제하면 등록이 완전히 제거됩니다.</p>
           <div id="rulesList" class="rules-list"></div>
+          <p id="targetsMsg" class="hint feedback"></p>
         </section>
 
         <section class="subpage scroll" id="sub-rule-alert" data-sub="rule-alert">
@@ -590,8 +592,8 @@
     </div>
   </div>
 
-  <script src="hero-zoom.js?v=rev8"></script>
+  <script src="hero-zoom.js?v=rev10"></script>
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev8"></script>
+  <script src="app.js?v=rev10"></script>
 </body>
 </html>
