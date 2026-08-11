@@ -215,7 +215,7 @@ html, body {
   height: 42px;
   width: auto;
   display: block;
-  filter: drop-shadow(0 4px 10px rgba(37, 99, 235, 0.28));
+  filter: drop-shadow(0 2px 6px rgba(25, 25, 25, 0.18));
 }
 .brand-wordmark {
   display: flex;
