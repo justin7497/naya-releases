@@ -188,10 +188,11 @@ html, body {
 .topbar {
   position: relative;
   padding-top: var(--safe-top);
-  background: linear-gradient(180deg, #fee500 0%, #fee500 72%, #f7e769 100%);
+  background: #ffffff;
   z-index: 40;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px -8px rgba(25, 25, 25, 0.25);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(25, 25, 25, 0.04);
 }
 .topbar::before {
   content: "";
@@ -200,7 +201,7 @@ html, body {
   left: -30px;
   width: 220px;
   height: 140px;
-  background: radial-gradient(60% 60% at 30% 40%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(60% 60% at 30% 40%, rgba(254, 229, 0, 0.12), rgba(254, 229, 0, 0) 70%);
   pointer-events: none;
 }
 .topbar-brand {
@@ -216,7 +217,7 @@ html, body {
   width: 44px;
   display: block;
   object-fit: contain;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.32));
+  filter: drop-shadow(0 1px 3px rgba(25, 25, 25, 0.14));
 }
 .brand-wordmark {
   display: flex;
@@ -229,14 +230,14 @@ html, body {
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #0f2d6e;
+  color: var(--text);
 }
 .brand-wordmark b span { color: #3c1e1e; }
 .brand-wordmark small {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(25, 25, 25, 0.62);
+  color: var(--muted);
 }
 /* App ON/OFF status chip */
 .topbar-status {
