@@ -601,12 +601,19 @@ html, body {
 #page-home .hub-tile {
   min-height: 0;
   height: 100%;
-  padding: 12px 8px 10px;
-  gap: 4px;
+  padding: 10px 8px 8px;
+  gap: 2px;
 }
 #page-home .hub-img {
-  width: 52px;
-  height: 52px;
+  width: 76px;
+  height: 76px;
+}
+#page-home .hub-label {
+  font-size: 13px;
+  margin-top: 2px;
+}
+#page-home .hub-sub {
+  font-size: 10px;
 }
 .hub-tile {
   position: relative;
@@ -644,7 +651,7 @@ html, body {
   flex-shrink: 0;
   display: block;
   margin: 0 auto;
-  filter: drop-shadow(0 3px 8px rgba(37, 99, 235, 0.12));
+  filter: none;
 }
 .hub-label {
   position: relative;
