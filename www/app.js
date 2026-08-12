@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 28;
+  const WEB_UI_REVISION = 29;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -433,111 +433,7 @@
       else startHeroAutoplay();
     });
 
-    bindHeroLightbox(track);
-  }
-
-  let heroLightboxIdx = 0;
-
-  function heroImageAt(idx) {
-    const slide = heroSlides()[idx];
-    if (!slide) return null;
-    const img = slide.querySelector(".home-hero-img, img");
-    if (!img) return null;
-    const src = img.currentSrc || img.getAttribute("src") || img.src;
-    if (!src) return null;
-    return { src, alt: img.alt || "" };
-  }
-
-  function renderHeroLightbox(idx) {
-    const box = $("heroLightbox");
-    const imgEl = $("heroLightboxImg");
-    const capEl = $("heroLightboxCap");
-    const slides = heroSlides();
-    if (!box || !imgEl || !slides.length) return;
-    heroLightboxIdx = ((idx % slides.length) + slides.length) % slides.length;
-    const data = heroImageAt(heroLightboxIdx);
-    if (!data) return;
-    imgEl.src = data.src;
-    imgEl.alt = data.alt;
-    if (capEl) capEl.textContent = data.alt;
-    const prev = $("heroLightboxPrev");
-    const next = $("heroLightboxNext");
-    if (prev) prev.hidden = slides.length < 2;
-    if (next) next.hidden = slides.length < 2;
-  }
-
-  function openHeroLightbox(idx) {
-    if (typeof window.__nayaHeroOpen === "function") {
-      pauseHeroBriefly();
-      window.__nayaHeroOpen(idx);
-      return;
-    }
-    const box = $("heroLightbox");
-    if (!box) return;
-    mountHeroLightbox();
-    pauseHeroBriefly();
-    renderHeroLightbox(idx);
-    box.removeAttribute("hidden");
-    box.hidden = false;
-    box.classList.add("is-open");
-    box.setAttribute("aria-hidden", "false");
-    document.body.classList.add("hero-lb-open");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeHeroLightbox() {
-    if (typeof window.__nayaHeroClose === "function" && window.__nayaHeroClose()) return true;
-    const box = $("heroLightbox");
-    if (!box || box.hidden) return false;
-    box.hidden = true;
-    box.setAttribute("hidden", "");
-    box.setAttribute("aria-hidden", "true");
-    box.classList.remove("is-open");
-    document.body.classList.remove("hero-lb-open");
-    document.body.style.overflow = "";
-    return true;
-  }
-
-  function mountHeroLightbox() {
-    const box = $("heroLightbox");
-    if (box && box.parentElement !== document.body) {
-      document.body.appendChild(box);
-    }
-  }
-
-  function bindHeroLightbox(track) {
-    mountHeroLightbox();
-    bindHeroLightboxControls();
-  }
-
-  function bindHeroLightboxControls() {
-    if (document.body.dataset.heroLbControls === "1") return;
-    document.body.dataset.heroLbControls = "1";
-
-    $("heroLightboxClose")?.addEventListener("click", () => closeHeroLightbox());
-    $("heroLightboxPrev")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx - 1));
-    $("heroLightboxNext")?.addEventListener("click", () => renderHeroLightbox(heroLightboxIdx + 1));
-    $("heroLightboxBody")?.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) closeHeroLightbox();
-    });
-
-    let lbTouchX = 0;
-    const box = $("heroLightbox");
-    box?.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.touches.length === 1) lbTouchX = e.touches[0].clientX;
-      },
-      { passive: true },
-    );
-    box?.addEventListener("touchend", (e) => {
-      if (window.__nayaHeroIsPinchZoomed?.()) return;
-      if (!box || box.hidden) return;
-      const dx = e.changedTouches[0].clientX - lbTouchX;
-      if (Math.abs(dx) < 56) return;
-      if (dx < 0) renderHeroLightbox(heroLightboxIdx + 1);
-      else renderHeroLightbox(heroLightboxIdx - 1);
-    });
+    startHeroAutoplay();
   }
 
   /* 모든 화면 이동은 이벤트 위임 한 곳에서 처리 */
@@ -1983,7 +1879,6 @@
     },
     /** @returns {boolean} true = 인앱에서 처리(이전화면), false = 홈이라 앱 백그라운드 */
     onBack: () => {
-      if (closeHeroLightbox()) return true;
       return goBack();
     },
   };
@@ -2021,7 +1916,6 @@
     switchTab,
     navigate,
     goBack,
-    openHeroZoom: (idx) => openHeroLightbox(typeof idx === "number" ? idx : heroIdx),
     openDetailPick: () => openSubpage("design-detail"),
     openStylePick: () => openSubpage("design-style"),
     openFramePick: () => openSubpage("design-frame"),
