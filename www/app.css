@@ -23,7 +23,7 @@
   --line: #d8e2ea;
   --radius: 16px;
   --appbar-h: 56px;
-  --tabbar-h: 62px;
+  --tabbar-h: 72px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --font-title: "Hahmlet", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", serif;
@@ -1688,20 +1688,20 @@ html, body {
   -webkit-mask-position: center;
 }
 .ic-home {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10.5 12 3l9 7.5'/%3E%3Cpath d='M5 9.5V21h14V9.5'/%3E%3C/svg%3E");
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10.5 12 3l9 7.5'/%3E%3Cpath d='M5 9.5V21h14V9.5'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 11.2 12 4l8 7.2'/%3E%3Cpath d='M6.5 10.2V20h11V10.2'/%3E%3Cpath d='M10 20v-5.5h4V20'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 11.2 12 4l8 7.2'/%3E%3Cpath d='M6.5 10.2V20h11V10.2'/%3E%3Cpath d='M10 20v-5.5h4V20'/%3E%3C/svg%3E");
 }
 .ic-target, .quick-ic.ic-target::before {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='black'/%3E%3C/svg%3E");
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8.5' cy='8' r='2.6'/%3E%3Ccircle cx='16.2' cy='8.8' r='2.2'/%3E%3Cpath d='M4.2 18.5c.9-3.2 2.8-4.8 4.3-4.8s3.4 1.6 4.2 4.8'/%3E%3Cpath d='M13.2 18.5c.5-2.2 1.8-3.4 3.2-3.4s2.6 1.2 3.1 3.4'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8.5' cy='8' r='2.6'/%3E%3Ccircle cx='16.2' cy='8.8' r='2.2'/%3E%3Cpath d='M4.2 18.5c.9-3.2 2.8-4.8 4.3-4.8s3.4 1.6 4.2 4.8'/%3E%3Cpath d='M13.2 18.5c.5-2.2 1.8-3.4 3.2-3.4s2.6 1.2 3.1 3.4'/%3E%3C/svg%3E");
 }
 .ic-palette, .quick-ic.ic-palette::before {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a3 3 0 0 1 0-6h5'/%3E%3Ccircle cx='7.5' cy='10' r='1' fill='black'/%3E%3Ccircle cx='10' cy='7' r='1' fill='black'/%3E%3Ccircle cx='14' cy='7' r='1' fill='black'/%3E%3C/svg%3E");
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 0-5H12a3 3 0 0 1 0-6h5'/%3E%3Ccircle cx='7.5' cy='10' r='1' fill='black'/%3E%3Ccircle cx='10' cy='7' r='1' fill='black'/%3E%3Ccircle cx='14' cy='7' r='1' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.5c1.6-5.2 5.2-7.8 8.2-7.8s6.6 2.6 8.2 7.8c-1.6 5.2-5.2 7.8-8.2 7.8s-6.6-2.6-8.2-7.8Z'/%3E%3Ccircle cx='12' cy='12.5' r='2.6'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.5c1.6-5.2 5.2-7.8 8.2-7.8s6.6 2.6 8.2 7.8c-1.6 5.2-5.2 7.8-8.2 7.8s-6.6-2.6-8.2-7.8Z'/%3E%3Ccircle cx='12' cy='12.5' r='2.6'/%3E%3C/svg%3E");
 }
 .ic-gear {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E");
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M5 7.2h14M5 12h14M5 16.8h14'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M5 7.2h14M5 12h14M5 16.8h14'/%3E%3C/svg%3E");
 }
 .quick-ic.ic-bell::before {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M6 9a6 6 0 1 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9'/%3E%3Cpath d='M10 20a2 2 0 0 0 4 0'/%3E%3C/svg%3E");
@@ -2641,17 +2641,17 @@ a.tab { text-decoration: none; color: #98a2b3; }
 /* ===== Tab bar (benchmark: iOS / Toss) ===== */
 .tabbar {
   flex-shrink: 0;
-  min-height: 62px;
-  height: calc(62px + max(var(--safe-bottom), 4px));
-  padding: 4px 6px max(var(--safe-bottom), 4px);
+  min-height: 72px;
+  height: calc(72px + max(var(--safe-bottom), 4px));
+  padding: 6px 6px max(var(--safe-bottom), 6px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   border-top: 1px solid rgba(17, 24, 39, 0.06);
-  box-shadow: 0 -6px 24px -12px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 -6px 24px -12px rgba(15, 23, 42, 0.14);
   z-index: 50;
 }
 .tab {
@@ -2662,9 +2662,9 @@ a.tab { text-decoration: none; color: #98a2b3; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   height: 100%;
-  padding: 2px 0 0;
+  padding: 4px 0 0;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -2683,36 +2683,37 @@ a.tab { text-decoration: none; color: #98a2b3; }
   position: absolute;
   top: 2px;
   left: 50%;
-  transform: translateX(-50%) scale(0.8);
-  width: 52px;
-  height: 30px;
-  border-radius: 15px;
+  transform: translateX(-50%) scale(0.85);
+  width: 58px;
+  height: 34px;
+  border-radius: 17px;
   background: var(--tc-soft);
   opacity: 0;
   transition: opacity 0.2s ease, transform 0.2s ease;
   pointer-events: none;
 }
 .tab .tab-ic {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   color: var(--tc);
-  opacity: 0.55;
+  opacity: 0.58;
   position: relative;
   z-index: 1;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 .tab .tab-label {
   color: var(--tc);
-  opacity: 0.7;
+  opacity: 0.72;
   position: relative;
   z-index: 1;
   white-space: nowrap;
+  font-size: 12px;
   transition: opacity 0.2s ease;
 }
 .tab:nth-child(3) .tab-label {
-  font-size: 10.5px;
+  font-size: 12px;
 }
-.tab:active .tab-ic { transform: scale(0.9); }
+.tab:active .tab-ic { transform: scale(0.92); }
 .tab.is-active::before {
   opacity: 1;
   transform: translateX(-50%) scale(1);
