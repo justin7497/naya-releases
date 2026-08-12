@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 49;
+  const WEB_UI_REVISION = 50;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1528,6 +1528,26 @@
     }
   }
 
+  function setPermState(key, on, opts) {
+    const supported = !opts || opts.supported !== false;
+    document.querySelectorAll(`[data-perm-state="${key}"]`).forEach((el) => {
+      if (!supported) {
+        el.hidden = true;
+        return;
+      }
+      el.hidden = false;
+      el.textContent = on ? "ON" : "OFF";
+      el.classList.toggle("is-on", !!on);
+      el.classList.toggle("is-off", !on);
+    });
+    document.querySelectorAll(`.perm-card[data-perm="${key}"]`).forEach((card) => {
+      if (!supported) return;
+      card.classList.toggle("is-on", !!on);
+      const go = card.querySelector(".perm-go");
+      if (go) go.textContent = on ? "설정 다시 열기 ›" : "설정 열기 ›";
+    });
+  }
+
   function fillStatus(st) {
     if (!st) return;
     caps = {
@@ -1551,6 +1571,10 @@
     const isPlay = caps.distribution === "play";
     const ready = st.enabled !== false && listenerOk && fsiOk && (!isPlay || overlayOk);
     appReady = ready;
+
+    setPermState("listener", listenerOk);
+    setPermState("overlay", overlayOk);
+    setPermState("fsi", !!st.fsiGranted, { supported: caps.fsiSupported });
 
     const top = $("topbarStatus");
     const topLabel = $("topbarStatusLabel");
