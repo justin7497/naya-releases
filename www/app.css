@@ -216,7 +216,9 @@ html, body {
   height: 44px;
   width: 44px;
   display: block;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #fee500;
   filter: drop-shadow(0 1px 3px rgba(25, 25, 25, 0.14));
 }
 .brand-wordmark {
