@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Hahmlet";
+  src: url("fonts/Hahmlet.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #b2c7d9;
   --card: #ffffff;
@@ -18,6 +26,7 @@
   --tabbar-h: 62px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --font-title: "Hahmlet", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", serif;
   font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
 
   /* Menu icon glyphs (stroked, commercial) */
@@ -229,6 +238,7 @@ html, body {
   line-height: 1;
 }
 .brand-wordmark b {
+  font-family: var(--font-title);
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -396,6 +406,8 @@ html, body {
 .hero-card.compact h1 {
   margin: 0 0 8px;
   font-size: 22px;
+  font-family: var(--font-title);
+  font-weight: 800;
 }
 .hero-card.compact .badge { margin: 0; }
 
@@ -2660,6 +2672,7 @@ input[type="number"]:focus, textarea:focus {
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text);
+  font-family: var(--font-title);
 }
 .doc-content { max-width: 430px; margin: 0 auto; padding: 16px 16px 40px; }
 .doc-lead {
