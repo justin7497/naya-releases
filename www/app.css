@@ -1536,6 +1536,56 @@ html, body {
   display: grid;
   place-items: center;
 }
+.perm-state {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
+  min-width: 44px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: 1;
+}
+.perm-state.is-on {
+  background: #FEE500;
+  color: #191919;
+}
+.perm-state.is-off {
+  background: #eef2f7;
+  color: #64748b;
+}
+.perm-card.is-on {
+  border-color: #fde68a;
+  background: #fffdf3;
+}
+.perm-cards-compact {
+  flex: 1;
+  gap: 10px;
+}
+.perm-cards-compact .perm-card {
+  flex: 0 0 auto;
+  min-height: 76px;
+  padding: 14px 16px;
+}
+.perm-cards-compact .perm-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+.perm-cards-compact .perm-ic::before {
+  width: 24px;
+  height: 24px;
+}
+.perm-cards-compact .perm-card strong {
+  font-size: 15px;
+}
+.perm-cards-compact .perm-go {
+  margin-top: 2px;
+  font-size: 13px;
+}
 
 .btn.block { width: 100%; margin-top: 12px; }
 .choice-grid.single { grid-template-columns: 1fr; }
