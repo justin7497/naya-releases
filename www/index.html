@@ -6,14 +6,14 @@
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#ffffff" />
   <title>나야나야</title>
-  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev49" />
-  <link rel="stylesheet" href="app.css?v=rev49" />
+  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev50" />
+  <link rel="stylesheet" href="app.css?v=rev50" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar" id="topbar">
       <div class="topbar-brand">
-        <img src="img/naya-logo.png?v=rev49" alt="" class="brand-logo" />
+        <img src="img/naya-logo.png?v=rev50" alt="" class="brand-logo" />
         <span class="brand-wordmark">
           <b>나야<span>나야</span></b>
           <small>중요한 알림만 크게</small>
@@ -57,13 +57,13 @@
           <div class="home-hero" id="homeHero">
             <div class="home-hero-track" id="homeHeroTrack">
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero.png?v=rev49" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
+                <img class="home-hero-img" src="img/home-hero.png?v=rev50" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev49" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
+                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev50" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev49" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
+                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev50" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
               </div>
             </div>
             <div class="home-hero-dots" id="homeHeroDots" aria-hidden="true">
@@ -75,22 +75,22 @@
 
           <div class="hub-grid">
             <button type="button" class="hub-tile" data-sub="setup" id="tileSetup">
-              <img class="hub-img" src="img/naya-icon-setup.png?v=rev49" alt="" />
+              <img class="hub-img" src="img/naya-icon-setup.png?v=rev50" alt="" />
               <span class="hub-label">시작하기</span>
               <span class="hub-sub">권한·연결 점검</span>
             </button>
             <button type="button" class="hub-tile" data-sub="recent">
-              <img class="hub-img" src="img/naya-icon-recent.png?v=rev49" alt="" />
+              <img class="hub-img" src="img/naya-icon-recent.png?v=rev50" alt="" />
               <span class="hub-label">최근에서 등록</span>
               <span class="hub-sub">방금 온 알림을 규칙으로</span>
             </button>
             <button type="button" class="hub-tile" data-sub="notif-link">
-              <img class="hub-img" src="img/naya-icon-search.png?v=rev49" alt="" />
+              <img class="hub-img" src="img/naya-icon-search.png?v=rev50" alt="" />
               <span class="hub-label">찾아 연결</span>
               <span class="hub-sub">앱·제목으로 직접 지정</span>
             </button>
             <button type="button" class="hub-tile accent" data-action="testCritical">
-              <img class="hub-img" src="img/naya-icon-test.png?v=rev49" alt="" />
+              <img class="hub-img" src="img/naya-icon-test.png?v=rev50" alt="" />
               <span class="hub-label">미리보기</span>
               <span class="hub-sub">긴급 알림 확인</span>
             </button>
@@ -230,32 +230,32 @@
             </div>
           </div>
           <div class="perm-cards">
-            <button type="button" class="perm-card" data-action="openListener">
+            <button type="button" class="perm-card" data-action="openListener" data-perm="listener">
               <span class="perm-ic pic-bell"></span>
               <span class="perm-body">
                 <strong>알림 접근</strong>
                 <span class="perm-desc">카톡·메일 알림을 읽어 중요한 것만 골라냅니다</span>
                 <span class="perm-go">설정 열기 ›</span>
               </span>
-              <span class="perm-step">1</span>
+              <span class="perm-state is-off" data-perm-state="listener">OFF</span>
             </button>
-            <button type="button" class="perm-card" data-action="openOverlay">
+            <button type="button" class="perm-card" data-action="openOverlay" data-perm="overlay">
               <span class="perm-ic pic-layers"></span>
               <span class="perm-body">
                 <strong>다른 앱 위에 표시</strong>
                 <span class="perm-desc">사용 중·잠금화면에서 팝업으로 크게 알려 줍니다</span>
                 <span class="perm-go">설정 열기 ›</span>
               </span>
-              <span class="perm-step">2</span>
+              <span class="perm-state is-off" data-perm-state="overlay">OFF</span>
             </button>
-            <button type="button" class="perm-card play-hide-fsi" data-action="openFsi">
+            <button type="button" class="perm-card play-hide-fsi" data-action="openFsi" data-perm="fsi">
               <span class="perm-ic pic-lock"></span>
               <span class="perm-body">
                 <strong>잠금화면 전체 알림</strong>
                 <span class="perm-desc">잠금 상태에서도 화면을 깨워 표시합니다</span>
                 <span class="perm-go">설정 열기 ›</span>
               </span>
-              <span class="perm-step">3</span>
+              <span class="perm-state is-off" data-perm-state="fsi">OFF</span>
             </button>
           </div>
         </section>
@@ -524,10 +524,31 @@
 
         <section class="subpage" id="sub-permissions" data-sub="permissions">
           <p id="permDetail" class="sub-lead"></p>
-          <div class="btn-stack">
-            <button type="button" class="btn primary" data-action="openListener">알림 접근</button>
-            <button type="button" class="btn ghost" data-action="openOverlay">다른 앱 위에 표시</button>
-            <button type="button" class="btn ghost play-hide-fsi" data-action="openFsi">잠금화면 전체 알림</button>
+          <div class="perm-cards perm-cards-compact">
+            <button type="button" class="perm-card" data-action="openListener" data-perm="listener">
+              <span class="perm-ic pic-bell"></span>
+              <span class="perm-body">
+                <strong>알림 접근</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state is-off" data-perm-state="listener">OFF</span>
+            </button>
+            <button type="button" class="perm-card" data-action="openOverlay" data-perm="overlay">
+              <span class="perm-ic pic-layers"></span>
+              <span class="perm-body">
+                <strong>다른 앱 위에 표시</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state is-off" data-perm-state="overlay">OFF</span>
+            </button>
+            <button type="button" class="perm-card play-hide-fsi" data-action="openFsi" data-perm="fsi">
+              <span class="perm-ic pic-lock"></span>
+              <span class="perm-body">
+                <strong>잠금화면 전체 알림</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state is-off" data-perm-state="fsi">OFF</span>
+            </button>
           </div>
         </section>
 
@@ -634,6 +655,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev49"></script>
+  <script src="app.js?v=rev50"></script>
 </body>
 </html>
