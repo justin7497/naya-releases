@@ -1,0 +1,89 @@
+{
+  "revision": 9,
+  "themes": [
+    {
+      "id": "kakao_beat_box",
+      "label": "Sol (솔)",
+      "desc": "햇살처럼 선명한 노란 카드",
+      "template": "card",
+      "colors": {
+        "flash": "#FFB2C7D9",
+        "sheet": "#FFFEE500",
+        "ink": "#FF191919",
+        "muted": "#FF555555",
+        "body": "#FF333333",
+        "headlineText": "#FF191919",
+        "headlineBg": "#99191C22",
+        "buttonFill": "#FF191919",
+        "buttonText": "#FFFFFFFF",
+        "openFill": "#FFFFFFFF",
+        "openText": "#FF191919",
+        "link": "#FF191919",
+        "stroke": "#FFFFFFFF"
+      }
+    },
+    {
+      "id": "kakao_beat_circle",
+      "label": "Halo (헤일로)",
+      "desc": "빛 고리가 감싼 노란 원",
+      "template": "circle",
+      "colors": {
+        "flash": "#FFB2C7D9",
+        "sheet": "#FFFEE500",
+        "ink": "#FF191919",
+        "muted": "#FF555555",
+        "body": "#FF333333",
+        "headlineText": "#FFFFFFFF",
+        "headlineBg": "#99191C22",
+        "buttonFill": "#FF191919",
+        "buttonText": "#FFFFFFFF",
+        "openFill": "#FFFFFFFF",
+        "openText": "#FF191919",
+        "link": "#FF2563EB",
+        "stroke": "#FFFFFFFF"
+      }
+    },
+    {
+      "id": "cream_circle",
+      "label": "Luna (루나)",
+      "desc": "달빛처럼 부드러운 크림 원",
+      "template": "circle",
+      "colors": {
+        "flash": "#FFE8D9C4",
+        "sheet": "#FFFFF6E8",
+        "ink": "#FF3D2B1F",
+        "muted": "#FF7A6558",
+        "body": "#FF5C4033",
+        "headlineText": "#FFFFFFFF",
+        "headlineBg": "#993D2B1F",
+        "buttonFill": "#FF3D2B1F",
+        "buttonText": "#FFFFFFFF",
+        "openFill": "#FFFFFFFF",
+        "openText": "#FF3D2B1F",
+        "link": "#FF8B5A2B",
+        "stroke": "#FFFFFFFF"
+      }
+    },
+    {
+      "id": "rose_heart",
+      "label": "Blush (블러시)",
+      "desc": "볼이 붉어지듯 뛰는 하트",
+      "template": "heart",
+      "colors": {
+        "flash": "#FFF4CDD4",
+        "sheet": "#FFFB7185",
+        "ink": "#FF191919",
+        "muted": "#FF9F1239",
+        "body": "#FF4C0519",
+        "headlineText": "#FFFFFFFF",
+        "headlineBg": "#99191C22",
+        "buttonFill": "#FF191919",
+        "buttonText": "#FFFFFFFF",
+        "openFill": "#FFFFFFFF",
+        "openText": "#FF191919",
+        "link": "#FF9F1239",
+        "stroke": "#FFFFFFFF"
+      }
+    }
+  ]
+}
