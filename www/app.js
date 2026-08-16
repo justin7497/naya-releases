@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 50;
+  const WEB_UI_REVISION = 51;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -15,18 +15,19 @@
   let installedApps = [];
   const selectedInstalledPackages = new Set();
   const ruleEditState = {
-    level: "NORMAL",
     soundId: "",
   };
 
   const designState = {
-    themeSet: "classic",
+    themeSet: "kakao_beat_box",
     themeStyle: "kakao_talk",
-    themeFrame: "thick",
-    themeFont: "giant",
+    themeFrame: "rounded",
+    themeFont: "rounded",
     themeSound: "naya",
     tts: false,
     catalog: null,
+    themeBgUrl: "",
+    hasThemeBg: false,
     styleGroup: "classic",
     frameGroup: "box",
     fontGroup: "classic",
@@ -35,32 +36,36 @@
   const defaultCatalog = {
     sets: [
       {
-        id: "classic",
-        label: "카카오톡 스타일",
-        desc: "채팅방 노란 말풍선 알림",
-        defaultStyle: "kakao_talk",
-        defaultFrame: "rounded",
-        defaultFont: "rounded",
+        id: "kakao_beat_box",
+        label: "Sol (솔)",
+        desc: "햇살처럼 선명한 노란 카드",
+        template: "card",
+        colors: { flash: "#B2C7D9", sheet: "#FEE500" },
       },
       {
-        id: "laser_scan",
-        label: "레이저 슬릿 스캔",
-        desc: "레이저가 화면을 훑고 네온 바가 나타나는 연출",
-        defaultStyle: "neon_night",
-        defaultFrame: "neon_ring",
-        defaultFont: "neon_slab",
+        id: "kakao_beat_circle",
+        label: "Halo (헤일로)",
+        desc: "빛 고리가 감싼 노란 원",
+        template: "circle",
+        colors: { flash: "#B2C7D9", sheet: "#FEE500" },
       },
       {
-        id: "heartbeat_pulse",
-        label: "하트비트 펄스",
-        desc: "가장자리 링이 중앙으로 박동하며 카드가 나타나는 연출",
-        defaultStyle: "rose_punch",
-        defaultFrame: "card",
-        defaultFont: "rounded",
+        id: "cream_circle",
+        label: "Luna (루나)",
+        desc: "달빛처럼 부드러운 크림 원",
+        template: "circle",
+        colors: { flash: "#E8D9C4", sheet: "#FFF6E8", ink: "#3D2B1F" },
+      },
+      {
+        id: "rose_heart",
+        label: "Blush (블러시)",
+        desc: "볼이 붉어지듯 뛰는 하트",
+        template: "heart",
+        colors: { flash: "#F4CDD4", sheet: "#FB7185" },
       },
     ],
     styles: [
-      { id: "kakao_talk", label: "카카오톡" },
+      { id: "kakao_talk", label: "노란 알림" },
       { id: "siren_classic", label: "사이렌 레드" },
       { id: "amber_alert", label: "선셋 경고" },
       { id: "neon_night", label: "네온 시티" },
@@ -204,6 +209,7 @@
       return extra.length ? base.concat(extra) : base;
     };
     return {
+      sets: Array.isArray(c.sets) && c.sets.length ? c.sets : defaultCatalog.sets,
       styles: mergeList("styles"),
       frames: mergeList("frames"),
       fonts: mergeList("fonts"),
@@ -218,8 +224,51 @@
     navigate({ tab: currentTab, sub: null });
   }
 
+  const SUBPAGE_TITLES = {
+    setup: "시작하기",
+    recent: "최근에서 등록",
+    "notif-link": "알림 찾아 연결",
+    targets: "등록된 대상",
+    "rule-archive": "비활성·삭제 목록",
+    "rule-alert": "대상 알림 설정",
+    apps: "감시할 앱",
+    "app-add": "내 앱 추가",
+    keywords: "키워드",
+    "design-sound": "알림 소리",
+    alarm: "알람 동작",
+    permissions: "권한",
+    test: "테스트",
+    about: "앱 정보",
+    privacy: "개인정보처리방침",
+  };
+
+  function ensureSubpageHeaders() {
+    document.querySelectorAll(".subpage[data-sub]").forEach((page) => {
+      if (page.querySelector(".subpage-header")) return;
+      const id = page.getAttribute("data-sub");
+      const header = document.createElement("div");
+      header.className = "subpage-header";
+      header.innerHTML = `
+        <button type="button" class="subpage-back" aria-label="뒤로">‹</button>
+        <h1 class="subpage-title">${SUBPAGE_TITLES[id] || "나야나야"}</h1>`;
+      header.querySelector(".subpage-back")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        goBack();
+      });
+      page.insertBefore(header, page.firstChild);
+    });
+  }
+
+  function updateSubpageTitle(sub) {
+    if (!sub) return;
+    const title = document.querySelector(`.subpage[data-sub="${sub}"] .subpage-title`);
+    if (title) title.textContent = SUBPAGE_TITLES[sub] || "나야나야";
+  }
+
   function openSubpage(name) {
-    navigate({ tab: currentTab, sub: name });
+    const sub = name === "permissions" ? "setup" : name;
+    navigate({ tab: currentTab, sub });
   }
 
   function applyGroupFromEl(el) {
@@ -267,6 +316,7 @@
     document.querySelector(".app-shell")?.classList.toggle("sub-open", !!sub);
 
     if (sub) {
+      updateSubpageTitle(sub);
       const active = document.querySelector(`.subpage[data-sub="${sub}"]`);
       if (active) {
         active.scrollTop = 0;
@@ -304,9 +354,11 @@
 
   /** 화면 이동. 뒤로가기는 직전 상태로 복귀한다. */
   function navigate(state, opts) {
+    let nextSub = state.sub === undefined ? null : state.sub;
+    if (nextSub === "permissions") nextSub = "setup";
     const next = {
       tab: state.tab || currentTab,
-      sub: state.sub === undefined ? null : state.sub,
+      sub: nextSub,
     };
     const cur = navSnap();
     if (navSame(cur, next)) {
@@ -441,10 +493,9 @@
     const target = ev.target;
     if (!target || typeof target.closest !== "function") return;
 
-    const doneBtn = target.closest("#btnStyleDone, #btnFrameDone, #btnFontDone, #btnSoundDone");
+    const doneBtn = target.closest("#btnSoundDone");
     if (doneBtn) {
-      // 세부 조정 → 스타일/프레임 등에서 완료 시 직전 화면(세부 조정)으로
-      if (!goBack()) navigate({ tab: "design", sub: "design-detail" }, { replace: true });
+      startSoundAndScreenPreview();
       return;
     }
 
@@ -754,55 +805,347 @@
     return text;
   }
 
+  function selectedTheme() {
+    return themeSets().find((s) => s.id === designState.themeSet) || null;
+  }
+
+  function toCssColor(value) {
+    const s = String(value || "").trim();
+    if (!s) return "";
+    const argb = s.match(/^#([0-9a-fA-F]{8})$/);
+    if (argb) return "#" + argb[1].slice(2);
+    return s;
+  }
+
+  function applyThemePreviewVars(el, set) {
+    if (!el) return;
+    const tpl = set?.template || "card";
+    const c = set?.colors || {};
+    el.dataset.template = tpl;
+    el.style.setProperty("--sheet", toCssColor(c.sheet) || "");
+    el.style.setProperty("--flash", toCssColor(c.flash) || "");
+    el.style.setProperty("--ink", toCssColor(c.ink) || "");
+  }
+
   function updateDesignPreview() {
+    const set = selectedTheme();
+    const url = designState.themeBgUrl || "";
+    const hasBg = !!designState.hasThemeBg && !!url;
     document.querySelectorAll(".design-preview").forEach((prev) => {
       prev.dataset.set = designState.themeSet;
       prev.dataset.style = designState.themeStyle;
       prev.dataset.frame = designState.themeFrame;
       prev.dataset.font = designState.themeFont;
+      applyThemePreviewVars(prev, set);
+      prev.classList.toggle("has-photo", hasBg);
+      prev.style.setProperty("--theme-bg", hasBg ? `url("${url}")` : "none");
     });
+    const clearBtn = $("clearThemeBgBtn");
+    if (clearBtn) clearBtn.hidden = !hasBg;
+    const meta = $("themeBgMeta");
+    if (meta) {
+      meta.textContent = hasBg ? "적용됨 · 탭해서 바꾸기" : "선택 · 없으면 테마 색";
+    }
+    const thumb = $("themeBgThumb");
+    if (thumb) {
+      thumb.classList.toggle("has-photo", hasBg);
+      thumb.style.backgroundImage = hasBg ? `url("${url}")` : "";
+      thumb.textContent = hasBg ? "" : "+";
+    }
+    const row = $("themeBgRow");
+    if (row) row.classList.toggle("has-photo", hasBg);
+  }
+
+  /** 브라우저 미리보기용 — 앱에서는 Native pickThemeBg 사용 */
+  function pickThemeBgInBrowser() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.addEventListener("change", () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = String(reader.result || "");
+        if (!dataUrl.startsWith("data:image")) {
+          toast("사진을 넣지 못했습니다", "designMsg");
+          return;
+        }
+        designState.hasThemeBg = true;
+        designState.themeBgUrl = dataUrl;
+        updateDesignPreview();
+        toast("배경 사진을 넣었습니다 (미리보기)", "designMsg");
+      };
+      reader.readAsDataURL(file);
+    });
+    input.click();
   }
 
   function themeSets() {
-    const fromNative = (catalog().sets || []).filter((s) => s && s.id);
+    const fromNative = (catalog().sets || []).filter((s) => s && s.id && s.id !== "ink_card");
     return fromNative.length ? fromNative : defaultCatalog.sets;
+  }
+
+  function themeSymbolSvg(id) {
+    if (id === "kakao_beat_circle") {
+      return `<svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="14" fill="none" stroke="var(--sheet)" stroke-width="2" opacity="0.35"/>
+        <circle cx="24" cy="24" r="11" fill="none" stroke="var(--sheet)" stroke-width="2.4"/>
+        <circle cx="24" cy="24" r="6.5" fill="var(--sheet)"/>
+      </svg>`;
+    }
+    if (id === "cream_circle") {
+      return `<svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="var(--ink)" d="M30.5 9.2a16.2 16.2 0 1 0 1.4 22.8 13.4 13.4 0 0 1-1.4-22.8z"/>
+      </svg>`;
+    }
+    if (id === "rose_heart") {
+      return `<svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="var(--sheet)" d="M24 40C11 28.4 7 22.2 7 15.8 7 11.2 10.6 8 15.2 8c3.2 0 6 1.8 8.8 5.4C26.8 9.8 29.6 8 32.8 8 37.4 8 41 11.2 41 15.8 41 22.2 37 28.4 24 40z"/>
+      </svg>`;
+    }
+    return `<svg viewBox="0 0 48 48" aria-hidden="true">
+      <g stroke="var(--sheet)" stroke-width="2.6" stroke-linecap="round">
+        <line x1="24" y1="5" x2="24" y2="11"/>
+        <line x1="24" y1="37" x2="24" y2="43"/>
+        <line x1="5" y1="24" x2="11" y2="24"/>
+        <line x1="37" y1="24" x2="43" y2="24"/>
+        <line x1="10.4" y1="10.4" x2="14.6" y2="14.6"/>
+        <line x1="33.4" y1="33.4" x2="37.6" y2="37.6"/>
+        <line x1="37.6" y1="10.4" x2="33.4" y2="14.6"/>
+        <line x1="14.6" y1="33.4" x2="10.4" y2="37.6"/>
+      </g>
+      <circle cx="24" cy="24" r="8.5" fill="var(--sheet)"/>
+    </svg>`;
+  }
+
+  function applyThemeSet(set, { silent } = {}) {
+    if (!set) return false;
+    const changed = designState.themeSet !== set.id;
+    if (changed) {
+      designState.themeSet = set.id;
+      if (set.defaultStyle) designState.themeStyle = set.defaultStyle;
+      if (set.defaultFrame) designState.themeFrame = set.defaultFrame;
+      if (set.defaultFont) designState.themeFont = set.defaultFont;
+    }
+    call("saveSettings", JSON.stringify(designPayload()));
+    if (!silent && changed) {
+      toast(`「${set.label}」 선택됨 · 팝업으로 확정해 주세요`, "designMsg");
+    }
+    if (changed) {
+      renderThemeSets();
+      updateDesignLabels();
+      updateDesignPreview();
+    }
+    return true;
+  }
+
+  let pendingThemeConfirmSet = null;
+  let pendingSoundFinalize = false;
+
+  function closeThemeConfirmModal() {
+    const modal = $("themeConfirmModal");
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    pendingThemeConfirmSet = null;
+  }
+
+  function closeThemeGuideModal() {
+    const modal = $("themeGuideModal");
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function closeSoundFinalizeModal() {
+    const modal = $("soundFinalizeModal");
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function currentSoundLabel() {
+    return labelOf(catalog().sounds || [], designState.themeSound) || "나야나야";
+  }
+
+  function openThemeGuideModal(set) {
+    const modal = $("themeGuideModal");
+    if (!modal) return;
+    const label = set?.label || "선택한 테마";
+    const sound = currentSoundLabel();
+    if ($("themeGuideTitle")) $("themeGuideTitle").textContent = "테마·소리가 확정되었습니다";
+    if ($("themeGuideBody")) {
+      $("themeGuideBody").textContent =
+        `「${label}」 · 「${sound}」로 확정했습니다. 중요한 알림이 오면 이 화면과 소리로 크게 알려 드립니다.`;
+    }
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function openSoundFinalizeModal() {
+    const modal = $("soundFinalizeModal");
+    if (!modal) return;
+    const set = selectedTheme();
+    const themeLabel = set?.label || "선택한 테마";
+    const sound = currentSoundLabel();
+    if ($("soundFinalizeTitle")) $("soundFinalizeTitle").textContent = "화면·소리 확인";
+    if ($("soundFinalizeBody")) {
+      $("soundFinalizeBody").textContent = native
+        ? `「${themeLabel}」 화면과 「${sound}」 소리를 확인했습니다. 이 설정으로 확정할까요?`
+        : `「${themeLabel}」 · 「${sound}」 설정입니다. 앱에서는 화면과 소리가 함께 미리보기 됩니다. 이 설정으로 확정할까요?`;
+    }
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function openThemeConfirmModal(set) {
+    const modal = $("themeConfirmModal");
+    if (!modal || !set) return;
+    pendingThemeConfirmSet = set;
+    if ($("themeConfirmTitle")) $("themeConfirmTitle").textContent = "테마 선택";
+    if ($("themeConfirmBody")) {
+      $("themeConfirmBody").textContent =
+        `「${set.label}」 테마를 적용하고 알림 소리 설정으로 이동합니다.`;
+    }
+    const preview = $("themeConfirmPreview");
+    if (preview) {
+      const tpl = set.template || "card";
+      preview.innerHTML = `<span class="theme-set-symbol">${themeSymbolSvg(set.id)}</span>`;
+      preview.setAttribute("data-set", set.id);
+      preview.setAttribute("data-template", tpl);
+      preview.className = "naya-modal-preview theme-set-visual";
+      applyThemePreviewVars(preview, set);
+    }
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  /** 테마 적용 후 소리 설정으로 이동 */
+  function goThemeToSound(set) {
+    if (!set) return;
+    applyThemeSet(set, { silent: true });
+    call("saveSettings", JSON.stringify(designPayload()));
+    closeThemeConfirmModal();
+    toast(`「${set.label}」 선택됨 · 소리를 고르세요`, "designMsg");
+    openSubpage("design-sound");
+  }
+
+  /** 소리 저장 → 화면+소리 미리보기 → 확정 모달 */
+  function startSoundAndScreenPreview() {
+    designState.tts = !!$("tts")?.checked;
+    call("saveSettings", JSON.stringify(designPayload()));
+    pendingSoundFinalize = true;
+    const set = selectedTheme();
+    const label = set?.label || "";
+    if (native) {
+      call("testAlert", JSON.stringify({ themeConfirm: true, label }));
+      // 미리보기 종료 후 onThemeConfirmDone → 확정 모달
+      toast("화면과 소리를 확인한 뒤 확정해 주세요", "designMsg");
+      return;
+    }
+    call("testAlert", "normal");
+    openSoundFinalizeModal();
+  }
+
+  function commitThemeAndSound() {
+    pendingSoundFinalize = false;
+    closeSoundFinalizeModal();
+    call("saveSettings", JSON.stringify(designPayload()));
+    const set = selectedTheme() || { label: "선택한 테마" };
+    openThemeGuideModal(set);
+    toast(`「${set.label}」 · 「${currentSoundLabel()}」로 확정되었습니다`, "designMsg");
+    navigate({ tab: "design", sub: null }, { replace: true });
+  }
+
+  function onThemeConfirmDone(label) {
+    const set =
+      pendingThemeConfirmSet ||
+      themeSets().find((s) => s.label === label) ||
+      themeSets().find((s) => s.id === designState.themeSet) ||
+      { label: label || "선택한 테마" };
+    pendingThemeConfirmSet = null;
+    if (pendingSoundFinalize) {
+      pendingSoundFinalize = false;
+      openSoundFinalizeModal();
+      return;
+    }
+    openThemeGuideModal(set);
+    toast(`「${set.label || label}」 테마로 확정되었습니다`, "designMsg");
+  }
+
+  function previewThemeSet(set) {
+    applyThemeSet(set, { silent: true });
+    openThemeConfirmModal(set);
+  }
+
+  function bindThemeModals() {
+    $("themeConfirmOk")?.addEventListener("click", () => {
+      const set = pendingThemeConfirmSet;
+      if (!set) return;
+      goThemeToSound(set);
+    });
+    $("themeGuideOk")?.addEventListener("click", () => closeThemeGuideModal());
+    $("soundFinalizeOk")?.addEventListener("click", () => commitThemeAndSound());
+    document.querySelectorAll("[data-theme-modal-close]").forEach((el) => {
+      el.addEventListener("click", () => closeThemeConfirmModal());
+    });
+    document.querySelectorAll("[data-theme-guide-close]").forEach((el) => {
+      el.addEventListener("click", () => closeThemeGuideModal());
+    });
+    document.querySelectorAll("[data-sound-finalize-close]").forEach((el) => {
+      el.addEventListener("click", () => {
+        pendingSoundFinalize = false;
+        closeSoundFinalizeModal();
+      });
+    });
   }
 
   function renderThemeSets() {
     const host = $("themeSetList");
     if (!host) return;
+    const sets = themeSets();
+    if (sets.length && !sets.some((s) => s.id === designState.themeSet)) {
+      designState.themeSet = sets[0].id;
+    }
     host.innerHTML = "";
-    themeSets().forEach((set) => {
-      const card = document.createElement("button");
-      card.type = "button";
+    sets.forEach((set) => {
+      const card = document.createElement("div");
       card.className =
         "theme-set-card" + (set.id === designState.themeSet ? " is-selected" : "");
       card.setAttribute("role", "option");
+      card.setAttribute("tabindex", "0");
       card.setAttribute("aria-selected", set.id === designState.themeSet ? "true" : "false");
+      const tpl = set.template || "card";
       card.innerHTML = `
-        <span class="theme-set-visual" data-set="${escapeHtml(set.id)}" aria-hidden="true">
-          <span class="theme-set-bar"></span>
+        <span class="theme-set-visual" data-set="${escapeHtml(set.id)}" data-template="${escapeHtml(tpl)}" aria-hidden="true">
+          <span class="theme-set-symbol">${themeSymbolSvg(set.id)}</span>
         </span>
         <span class="theme-set-text">
           <span class="theme-set-label">${escapeHtml(set.label)}</span>
           <span class="theme-set-desc">${escapeHtml(set.desc || "")}</span>
         </span>
-        <span class="theme-set-check" aria-hidden="true">✓</span>`;
-      card.addEventListener("click", () => {
+        <span class="theme-set-check" aria-hidden="true">✓</span>
+        <button type="button" class="theme-set-preview-btn">다음: 소리 설정</button>`;
+      applyThemePreviewVars(card.querySelector(".theme-set-visual"), set);
+      const selectCard = () => {
         if (designState.themeSet === set.id) return;
-        designState.themeSet = set.id;
-        if (set.defaultStyle) designState.themeStyle = set.defaultStyle;
-        if (set.defaultFrame) designState.themeFrame = set.defaultFrame;
-        if (set.defaultFont) designState.themeFont = set.defaultFont;
-        const result = call("saveSettings", JSON.stringify(designPayload()));
-        const parsed = parseJson(result, { ok: false, message: "저장 실패" });
-        toast(
-          parsed.ok ? `「${set.label}」 테마가 적용되었습니다` : parsed.message,
-          "designMsg",
-        );
-        renderThemeSets();
-        updateDesignLabels();
-        updateDesignPreview();
+        applyThemeSet(set);
+      };
+      card.addEventListener("click", selectCard);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectCard();
+        }
+      });
+      const previewBtn = card.querySelector(".theme-set-preview-btn");
+      previewBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        applyThemeSet(set, { silent: true });
+        call("saveSettings", JSON.stringify(designPayload()));
+        toast(`「${set.label}」 선택됨 · 소리를 고르세요`, "designMsg");
+        openSubpage("design-sound");
       });
       host.appendChild(card);
     });
@@ -1179,7 +1522,6 @@
     const rule = currentRules.find((item) => item.id === ruleId);
     if (!rule) return;
     currentRuleId = rule.id;
-    ruleEditState.level = rule.level === "CRITICAL" ? "CRITICAL" : "NORMAL";
     ruleEditState.soundId = rule.soundId || "";
     navigate({ tab: "rules", sub: "rule-alert" });
     renderRuleAlertEditor();
@@ -1228,19 +1570,6 @@
       $("ruleAlertName").textContent = `${rule.matchTitle} · 알림 설정`;
     }
     renderRuleAvatarEditor(rule);
-
-    document.querySelectorAll("[data-rule-level]").forEach((btn) => {
-      const selected = btn.getAttribute("data-rule-level") === ruleEditState.level;
-      btn.classList.toggle("is-selected", selected);
-      btn.setAttribute("aria-pressed", selected ? "true" : "false");
-      if (btn.dataset.bound !== "1") {
-        btn.dataset.bound = "1";
-        btn.addEventListener("click", () => {
-          ruleEditState.level = btn.getAttribute("data-rule-level") || "NORMAL";
-          renderRuleAlertEditor();
-        });
-      }
-    });
 
     const grid = $("ruleSoundPickGrid");
     if (!grid) return;
@@ -1298,7 +1627,6 @@
   }
 
   function renderArchiveRuleCard(rule, mode) {
-    const crit = rule.level === "CRITICAL";
     const avatarDataUrl = ruleAvatarDataUrl(rule);
     const actions = mode === "deleted"
       ? `<div class="rule-actions rule-actions-status rule-actions-two">
@@ -1317,7 +1645,6 @@
             <div class="app">${escapeHtml(rule.appLabel || rule.packageName)}</div>
             <div class="title">${escapeHtml(rule.matchTitle)}</div>
             <span class="pill ${mode === "deleted" ? "deleted" : "paused"}">${mode === "deleted" ? "삭제됨" : "비활성"}</span>
-            <span class="pill ${crit ? "crit" : ""}">${crit ? "초긴급" : "일반"}</span>
           </div>
         </div>
         ${actions}
@@ -1401,7 +1728,6 @@
     activeRules.forEach((r) => {
       const card = document.createElement("div");
       card.className = "rule-card";
-      const crit = r.level === "CRITICAL";
       const avatarDataUrl = ruleAvatarDataUrl(r);
       const soundLabel = r.soundId
         ? labelOf(catalog().sounds || [], r.soundId)
@@ -1413,7 +1739,6 @@
             <div class="app">${escapeHtml(r.appLabel || r.packageName)}</div>
             <div class="title">${escapeHtml(r.matchTitle)}</div>
             <span class="pill">활성</span>
-            <span class="pill ${crit ? "crit" : ""}">${crit ? "초긴급" : "일반"}</span>
             <span class="pill rule-sound">${escapeHtml(soundLabel)}</span>
           </div>
         </div>
@@ -1460,7 +1785,6 @@
       requireKeyword: $("requireKeyword")?.checked ?? false,
       snoozeMinutes: Number($("snoozeMinutes")?.value || 0),
       keywords: $("keywords")?.value.trim() || "",
-      criticalKeywords: $("criticalKeywords")?.value.trim() || "",
       watchedPackages: packages,
       ...designPayload(),
     };
@@ -1476,14 +1800,18 @@
     if ($("requireKeyword")) $("requireKeyword").checked = !!s.requireKeyword;
     if ($("snoozeMinutes")) $("snoozeMinutes").value = String(s.snoozeMinutes ?? 5);
     if ($("keywords")) $("keywords").value = s.keywords || "";
-    if ($("criticalKeywords")) $("criticalKeywords").value = s.criticalKeywords || "";
     renderApps(s.appPresets || []);
-    if (s.themeSet) designState.themeSet = s.themeSet;
     if (s.themeStyle) designState.themeStyle = s.themeStyle;
     if (s.themeFrame) designState.themeFrame = s.themeFrame;
     if (s.themeFont) designState.themeFont = s.themeFont;
     if (s.themeSound) designState.themeSound = s.themeSound;
     if (s.themeCatalog) designState.catalog = s.themeCatalog;
+    if (s.themeSet) {
+      const ids = themeSets().map((t) => t.id);
+      designState.themeSet = ids.includes(s.themeSet) ? s.themeSet : "kakao_beat_box";
+    }
+    designState.hasThemeBg = !!s.hasThemeBg;
+    designState.themeBgUrl = s.themeBgDataUrl || "";
     // 지원 종료된 프레임 id(구 형태 프레임)는 기본 카드로 정규화
     if (!(catalog().frames || []).some((f) => f.id === designState.themeFrame)) {
       designState.themeFrame = "card";
@@ -1682,6 +2010,25 @@
     return REMOTE_WWW_FALLBACK;
   }
 
+  async function loadBrowserThemeCatalog() {
+    const urls = [`./themes.json?_=${Date.now()}`, `${REMOTE_WWW_FALLBACK}/themes.json?_=${Date.now()}`];
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) continue;
+        const data = await res.json();
+        const themes = data.themes || data.sets;
+        if (!Array.isArray(themes) || !themes.length) continue;
+        designState.catalog = Object.assign({}, designState.catalog || {}, { sets: themes });
+        renderDesignPickers();
+        return url;
+      } catch (_) {
+        /* try next */
+      }
+    }
+    return null;
+  }
+
   async function checkWebUiUpdate(st) {
     const banner = $("webUiBanner");
     if (!banner) return;
@@ -1768,7 +2115,6 @@
     if (!currentRuleId) return;
     const payload = JSON.stringify({
       id: currentRuleId,
-      level: ruleEditState.level,
       soundId: ruleEditState.soundId,
     });
     const parsed = parseJson(call("updateWatchRule", payload), {
@@ -1855,13 +2201,35 @@
           break;
         }
         case "testNormal":
+        case "testCritical":
           call("saveSettings", JSON.stringify(designPayload()));
           call("testAlert", "normal");
           break;
-        case "testCritical":
-          call("saveSettings", JSON.stringify(designPayload()));
-          call("testAlert", "critical");
+        case "navBack":
+          goBack();
           break;
+        case "pickThemeBg":
+          if (native && typeof native.pickThemeBg === "function") {
+            call("pickThemeBg");
+          } else {
+            pickThemeBgInBrowser();
+          }
+          break;
+        case "clearThemeBg": {
+          if (native && typeof native.clearThemeBg === "function") {
+            const r = parseJson(call("clearThemeBg"), { ok: false });
+            designState.hasThemeBg = false;
+            designState.themeBgUrl = "";
+            updateDesignPreview();
+            toast(r.message || "배경 사진을 지웠습니다", "designMsg");
+          } else {
+            designState.hasThemeBg = false;
+            designState.themeBgUrl = "";
+            updateDesignPreview();
+            toast("배경 사진을 지웠습니다", "designMsg");
+          }
+          break;
+        }
         case "clearRecent": {
           const r = parseJson(call("clearRecentNotifications"), { ok: false });
           toast(r.message || "비웠습니다", "filtersMsg");
@@ -1885,6 +2253,10 @@
   window.NotiSirenWeb = {
     onResume: refresh,
     onUpdateAvailable: refresh,
+    onThemeCatalogUpdated: refresh,
+    onThemeConfirmDone: (label) => {
+      onThemeConfirmDone(label);
+    },
     onAppLinkReturn: (packageName) => {
       if (packageName) linkSelectedPackage = packageName;
       renderLinkAppPicker(cachedAppPresets);
@@ -1900,6 +2272,10 @@
       if (ruleId === currentRuleId) {
         toast(saved ? "프로필 사진을 저장했습니다" : "사진을 저장하지 못했습니다", "ruleAlertMsg");
       }
+    },
+    onThemeBgPicked: (saved) => {
+      refresh();
+      toast(saved ? "배경 사진을 넣었습니다" : "사진을 넣지 못했습니다", "designMsg");
     },
     /** @returns {boolean} true = 인앱에서 처리(이전화면), false = 홈이라 앱 백그라운드 */
     onBack: () => {
@@ -1924,15 +2300,18 @@
   updateLockPreviewClock();
   renderDesignPickers();
   bindHeroCarousel();
+  bindThemeModals();
+  ensureSubpageHeaders();
   const hashTab = (location.hash || "").replace("#", "");
   navigate(
-    { tab: ["home", "rules", "design", "settings"].includes(hashTab) ? hashTab : "home", sub: null },
+    { tab: ["design", "home", "rules", "settings"].includes(hashTab) ? hashTab : "home", sub: null },
     { replace: true },
   );
   fitShellToScreen();
   window.addEventListener("resize", fitShellToScreen);
   refresh();
   setTimeout(refresh, 200);
+  loadBrowserThemeCatalog();
 
   window.NayaNav = {
     openSubpage,
@@ -1940,10 +2319,6 @@
     switchTab,
     navigate,
     goBack,
-    openDetailPick: () => openSubpage("design-detail"),
-    openStylePick: () => openSubpage("design-style"),
-    openFramePick: () => openSubpage("design-frame"),
-    openFontPick: () => openSubpage("design-font"),
     openSoundPick: () => openSubpage("design-sound"),
   };
 })();
