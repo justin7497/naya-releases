@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 54;
+  const WEB_UI_REVISION = 55;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -837,14 +837,15 @@
       prev.dataset.frame = designState.themeFrame;
       prev.dataset.font = designState.themeFont;
       applyThemePreviewVars(prev, set);
-      prev.classList.toggle("has-photo", hasBg);
-      prev.style.setProperty("--theme-bg", hasBg ? `url("${url}")` : "none");
+      // 사진은 로고 원형만 — 시트 전체 배경 미리보기 사용 안 함
+      prev.classList.remove("has-photo");
+      prev.style.removeProperty("--theme-bg");
     });
     const clearBtn = $("clearThemeBgBtn");
     if (clearBtn) clearBtn.hidden = !hasBg;
     const meta = $("themeBgMeta");
     if (meta) {
-      meta.textContent = hasBg ? "적용됨 · 탭해서 바꾸기" : "선택 · 없으면 테마 색";
+      meta.textContent = hasBg ? "원형 로고에 적용됨 · 탭해서 바꾸기" : "원형 로고 안 · 없으면 이니셜";
     }
     const thumb = $("themeBgThumb");
     if (thumb) {
@@ -874,7 +875,7 @@
         designState.hasThemeBg = true;
         designState.themeBgUrl = dataUrl;
         updateDesignPreview();
-        toast("배경 사진을 넣었습니다 (미리보기)", "designMsg");
+        toast(saved ? "로고 사진을 넣었습니다 (미리보기)" : "사진을 넣지 못했습니다", "designMsg");
       };
       reader.readAsDataURL(file);
     });
@@ -2221,12 +2222,12 @@
             designState.hasThemeBg = false;
             designState.themeBgUrl = "";
             updateDesignPreview();
-            toast(r.message || "배경 사진을 지웠습니다", "designMsg");
+            toast(r.message || "로고 사진을 지웠습니다", "designMsg");
           } else {
             designState.hasThemeBg = false;
             designState.themeBgUrl = "";
             updateDesignPreview();
-            toast("배경 사진을 지웠습니다", "designMsg");
+            toast("로고 사진을 지웠습니다", "designMsg");
           }
           break;
         }
@@ -2275,7 +2276,7 @@
     },
     onThemeBgPicked: (saved) => {
       refresh();
-      toast(saved ? "배경 사진을 넣었습니다" : "사진을 넣지 못했습니다", "designMsg");
+      toast(saved ? "로고 사진을 넣었습니다" : "사진을 넣지 못했습니다", "designMsg");
     },
     /** @returns {boolean} true = 인앱에서 처리(이전화면), false = 홈이라 앱 백그라운드 */
     onBack: () => {
