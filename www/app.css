@@ -1026,8 +1026,8 @@ html, body {
   flex-shrink: 1;
 }
 #page-design .theme-set-symbol svg {
-  width: 58px;
-  height: 58px;
+  width: 48px;
+  height: 48px;
 }
 #page-design .theme-set-visual[data-template="circle"] .theme-set-bar {
   width: 48px;
@@ -1060,7 +1060,11 @@ html, body {
   line-height: 1.2;
 }
 #page-design .theme-set-desc {
-  display: none;
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--muted);
 }
 #page-design .theme-set-check {
   position: absolute;
@@ -1247,32 +1251,6 @@ html, body {
   text-align: center;
 }
 
-/* 레이저는 실제 알림처럼 큰 카드가 아닌 슬림 네온 바로 미리보기 */
-#designDetailPreview[data-set="laser_scan"] .preview-flash {
-  min-height: 112px;
-  padding: 22px 8px !important;
-}
-#designDetailPreview[data-set="laser_scan"] .preview-sheet {
-  width: 100% !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 10px 12px !important;
-}
-#designDetailPreview[data-set="laser_scan"] .preview-head {
-  font-size: 11px;
-}
-#designDetailPreview[data-set="laser_scan"] .preview-app {
-  margin-top: 2px;
-  font-size: 10px;
-}
-#designDetailPreview[data-set="laser_scan"] .preview-title {
-  margin-top: 3px;
-  font-size: 23px;
-}
-#designDetailPreview[data-set="laser_scan"] .preview-body {
-  margin-top: 3px;
-  font-size: 10.5px;
-}
 .design-preview-label {
   margin: 0 0 6px;
   font-size: 12px;
@@ -1831,6 +1809,18 @@ html, body {
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='11' width='16' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E");
 }
 .perm-body { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.perm-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.perm-need {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #9a3412;
+  background: #ffedd5;
+  border-radius: 999px;
+  padding: 3px 8px;
+  line-height: 1.2;
+}
 .perm-card strong { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
 .perm-desc { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
 .perm-go { margin-top: 5px; font-size: 14px; color: var(--primary); font-weight: 700; }
@@ -1872,6 +1862,10 @@ html, body {
 .perm-card.is-on {
   border-color: #fde68a;
   background: #fffdf3;
+}
+.perm-card.need-on {
+  border-color: #fb923c;
+  background: #fff7ed;
 }
 .perm-cards-compact {
   flex: 1;
@@ -3331,61 +3325,6 @@ a.tab { text-decoration: none; color: #98a2b3; }
   border-radius: 6px;
   background: rgba(15, 23, 42, 0.85);
 }
-.theme-set-visual[data-set="laser_scan"] { background: #0b0e14; }
-.theme-set-visual[data-set="laser_scan"]::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 26%;
-  width: 3px;
-  background: #00f0ff;
-  box-shadow: 0 0 8px 2px rgba(0, 240, 255, 0.8);
-}
-.theme-set-visual[data-set="laser_scan"] .theme-set-bar {
-  position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 50%;
-  height: 15px;
-  transform: translateY(-50%);
-  border-radius: 5px;
-  background: rgba(13, 20, 32, 0.9);
-  border: 1px solid #00f0ff;
-  box-shadow: 0 0 7px rgba(0, 240, 255, 0.55);
-}
-.theme-set-visual[data-set="heartbeat_pulse"] {
-  background: #1a0a0f;
-  overflow: hidden;
-}
-.theme-set-visual[data-set="heartbeat_pulse"]::before,
-.theme-set-visual[data-set="heartbeat_pulse"]::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 7px;
-  border: 2px solid rgba(255, 45, 85, 0.55);
-  animation: hbRingShrink 2.4s ease-out infinite;
-}
-.theme-set-visual[data-set="heartbeat_pulse"]::after {
-  inset: 9px;
-  animation-delay: 0.18s;
-  border-color: rgba(255, 45, 85, 0.35);
-}
-.theme-set-visual[data-set="heartbeat_pulse"] .theme-set-bar {
-  position: absolute;
-  inset: 14px 18px;
-  border-radius: 8px;
-  background: rgba(26, 10, 15, 0.92);
-  border: 1.5px solid #ff2d55;
-  box-shadow: 0 0 8px rgba(255, 45, 85, 0.45);
-}
-@keyframes hbRingShrink {
-  0%, 58% { transform: scale(1.08); opacity: 0; }
-  62% { opacity: 1; }
-  88% { transform: scale(0.92); opacity: 0.85; }
-  100% { transform: scale(0.9); opacity: 0; }
-}
 .theme-set-text { display: block; min-width: 0; }
 .theme-set-label {
   display: block;
@@ -3419,93 +3358,6 @@ a.tab { text-decoration: none; color: #98a2b3; }
   justify-self: end;
 }
 .theme-set-card.is-selected .theme-set-check { opacity: 1; transform: scale(1); }
-
-/* 레이저 슬릿 스캔 미리보기 */
-.design-preview[data-set="laser_scan"] .preview-flash {
-  position: relative;
-  overflow: hidden;
-  background: #0b0e14 !important;
-  animation: none !important;
-  box-shadow: none !important;
-}
-.design-preview[data-set="laser_scan"] .preview-flash::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  left: -4%;
-  background: #00f0ff;
-  box-shadow: 0 0 10px 2px rgba(0, 240, 255, 0.85);
-  animation: laserSweep 2.8s ease-in-out infinite;
-}
-@keyframes laserSweep {
-  0%, 55% { left: -4%; opacity: 0; }
-  60% { opacity: 1; }
-  82% { left: 102%; opacity: 1; }
-  100% { left: 102%; opacity: 0; }
-}
-.design-preview[data-set="laser_scan"] .preview-sheet {
-  background: rgba(13, 20, 32, 0.92) !important;
-  border: 1.5px solid #00f0ff !important;
-  border-radius: 12px !important;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4) !important;
-  clip-path: none !important;
-  mask-image: none !important;
-  -webkit-mask-image: none !important;
-}
-.design-preview[data-set="laser_scan"] .preview-head { color: #ff0055 !important; }
-.design-preview[data-set="laser_scan"] .preview-app { color: #00f0ff !important; }
-.design-preview[data-set="laser_scan"] .preview-title {
-  color: #fff !important;
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
-}
-.design-preview[data-set="laser_scan"] .preview-body { color: #c7d2e0 !important; }
-
-/* 하트비트 펄스 미리보기 */
-.design-preview[data-set="heartbeat_pulse"] .preview-flash {
-  position: relative;
-  overflow: hidden;
-  background: #1a0a0f !important;
-  animation: none !important;
-  box-shadow: none !important;
-}
-.design-preview[data-set="heartbeat_pulse"] .preview-flash::before,
-.design-preview[data-set="heartbeat_pulse"] .preview-flash::after {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 45, 85, 0.6);
-  animation: hbRingShrink 2.6s ease-out infinite;
-  pointer-events: none;
-}
-.design-preview[data-set="heartbeat_pulse"] .preview-flash::after {
-  inset: 12px;
-  animation-delay: 0.2s;
-  border-color: rgba(255, 45, 85, 0.35);
-}
-.design-preview[data-set="heartbeat_pulse"] .preview-sheet {
-  background: rgba(26, 10, 15, 0.94) !important;
-  border: 2px solid #ff2d55 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 0 16px rgba(255, 45, 85, 0.35) !important;
-  animation: hbCardBeat 2.6s ease-in-out infinite;
-  clip-path: none !important;
-  mask-image: none !important;
-  -webkit-mask-image: none !important;
-}
-@keyframes hbCardBeat {
-  0%, 54% { transform: scale(1); }
-  58% { transform: scale(1.02); }
-  64% { transform: scale(1); }
-  68% { transform: scale(1.015); }
-  74%, 100% { transform: scale(1); }
-}
-.design-preview[data-set="heartbeat_pulse"] .preview-head { color: #fda4af !important; }
-.design-preview[data-set="heartbeat_pulse"] .preview-app { color: #fb7185 !important; }
-.design-preview[data-set="heartbeat_pulse"] .preview-title { color: #fff1f2 !important; }
-.design-preview[data-set="heartbeat_pulse"] .preview-body { color: #fecdd3 !important; }
 
 .design-preview[data-set="kakao_beat_box"] .preview-flash,
 .design-preview[data-set="kakao_beat_circle"] .preview-flash {
