@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 55;
+  const WEB_UI_REVISION = 59;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -38,28 +38,28 @@
       {
         id: "kakao_beat_box",
         label: "Sol (솔)",
-        desc: "햇살처럼 선명한 노란 카드",
+        desc: "노란 카드 · 본문까지",
         template: "card",
         colors: { flash: "#B2C7D9", sheet: "#FEE500" },
       },
       {
         id: "kakao_beat_circle",
         label: "Halo (헤일로)",
-        desc: "빛 고리가 감싼 노란 원",
+        desc: "노란 원 · 이름만",
         template: "circle",
         colors: { flash: "#B2C7D9", sheet: "#FEE500" },
       },
       {
         id: "cream_circle",
         label: "Luna (루나)",
-        desc: "달빛처럼 부드러운 크림 원",
+        desc: "크림 원 · 이름만",
         template: "circle",
         colors: { flash: "#E8D9C4", sheet: "#FFF6E8", ink: "#3D2B1F" },
       },
       {
         id: "rose_heart",
         label: "Blush (블러시)",
-        desc: "볼이 붉어지듯 뛰는 하트",
+        desc: "분홍 하트 · 이름만",
         template: "heart",
         colors: { flash: "#F4CDD4", sheet: "#FB7185" },
       },
@@ -882,8 +882,17 @@
     input.click();
   }
 
+  const SHIPPED_THEME_IDS = new Set([
+    "kakao_beat_box",
+    "kakao_beat_circle",
+    "cream_circle",
+    "rose_heart",
+  ]);
+
   function themeSets() {
-    const fromNative = (catalog().sets || []).filter((s) => s && s.id && s.id !== "ink_card");
+    const fromNative = (catalog().sets || []).filter(
+      (s) => s && s.id && SHIPPED_THEME_IDS.has(s.id),
+    );
     return fromNative.length ? fromNative : defaultCatalog.sets;
   }
 
@@ -1154,23 +1163,8 @@
 
   function updateDesignLabels() {
     const cat = catalog();
-    const laser = designState.themeSet === "laser_scan";
-    const heartbeat = designState.themeSet === "heartbeat_pulse";
-    const fixedSet = laser || heartbeat;
-    if ($("styleLabel")) {
-      $("styleLabel").textContent = laser
-        ? "세트 고정 (네온)"
-        : heartbeat
-          ? "세트 고정 (로즈)"
-          : labelOf(cat.styles, designState.themeStyle);
-    }
-    if ($("frameLabel")) {
-      $("frameLabel").textContent = laser
-        ? "세트 고정 (슬림 바)"
-        : heartbeat
-          ? "세트 고정 (중앙 카드)"
-          : labelOf(cat.frames, designState.themeFrame);
-    }
+    if ($("styleLabel")) $("styleLabel").textContent = labelOf(cat.styles, designState.themeStyle);
+    if ($("frameLabel")) $("frameLabel").textContent = labelOf(cat.frames, designState.themeFrame);
     if ($("fontLabel")) $("fontLabel").textContent = labelOf(cat.fonts, designState.themeFont);
     if ($("soundLabel")) {
       const sound = labelOf(cat.sounds || [], designState.themeSound);
@@ -1182,16 +1176,8 @@
         ? `현재 테마 · ${set.label}`
         : "현재 테마";
     }
-    // 세트 자체가 고정하는 항목은 화살표가 있는 선택 메뉴로 노출하지 않는다.
-    // 레이저 세트는 슬림 바 레이아웃과 네온 스타일이 연출의 일부이므로 글꼴·소리만 조정한다.
-    if ($("detailStyleItem")) $("detailStyleItem").hidden = fixedSet;
-    if ($("detailFrameItem")) $("detailFrameItem").hidden = fixedSet;
     if ($("designDetailHint")) {
-      $("designDetailHint").textContent = laser
-        ? "레이저 연출은 글꼴과 소리만 조정할 수 있습니다."
-        : heartbeat
-          ? "하트비트 연출은 글꼴과 소리만 조정할 수 있습니다."
-          : "스타일·프레임·글꼴·소리를 원하는 대로 조정할 수 있습니다.";
+      $("designDetailHint").textContent = "스타일·프레임·글꼴·소리를 원하는 대로 조정할 수 있습니다.";
     }
     if ($("styleSubPreviewLabel")) {
       $("styleSubPreviewLabel").textContent = labelOf(cat.styles, designState.themeStyle);
@@ -1843,8 +1829,22 @@
     if (intro) {
       intro.textContent = caps.fsiSupported
         ? "3단계면 준비 끝"
-        : "2단계면 준비 끝 (잠금화면 팝업은 오버레이 필수)";
+        : "2가지만 허용하면 됩니다";
     }
+    const lead = $("setupIntroLead");
+    if (lead) {
+      lead.textContent = caps.fsiSupported
+        ? "처음 한 번만 허용하면 됩니다."
+        : "다른 앱 위에 표시를 켜야 잠금화면에서도 크게 뜹니다.";
+    }
+    document.querySelectorAll(".play-only-overlay").forEach((el) => {
+      el.hidden = caps.fsiSupported;
+    });
+    document.querySelectorAll(".overlay-desc").forEach((el) => {
+      el.textContent = caps.fsiSupported
+        ? "다른 앱을 쓰는 중에도 팝업으로 알려 줍니다"
+        : "허용하지 않으면 잠금화면에서 크게 안 뜹니다";
+    });
     const stickyLabel = $("stickyLabel");
     if (stickyLabel) {
       stickyLabel.textContent = caps.exactAlarmEnabled ? "확인 전까지 유지" : "확인 전 재알림";
@@ -1904,6 +1904,9 @@
     setPermState("listener", listenerOk);
     setPermState("overlay", overlayOk);
     setPermState("fsi", !!st.fsiGranted, { supported: caps.fsiSupported });
+    document.querySelectorAll('.perm-card[data-perm="overlay"]').forEach((card) => {
+      card.classList.toggle("need-on", isPlay && !overlayOk);
+    });
 
     const top = $("topbarStatus");
     const topLabel = $("topbarStatusLabel");
@@ -1926,13 +1929,13 @@
     if (st.enabled === false) parts.push("알람 꺼짐");
     else parts.push("알람 켜짐");
     if (!listenerOk) parts.push("알림 접근 필요");
-    if (isPlay && !overlayOk) parts.push("오버레이 필요");
+    if (isPlay && !overlayOk) parts.push("다른 앱 위에 표시 필요");
     if (caps.fsiSupported && !fsiOk) parts.push("잠금 화면 필요");
     const short = ready ? "정상" : parts.slice(0, 2).join(" · ");
     const permParts = [
       st.enabled === false ? "알람 꺼짐" : "알람 켜짐",
       listenerOk ? "알림 접근 허용됨" : "알림 접근 필요",
-      overlayOk ? "오버레이 허용됨" : "오버레이 필요",
+      overlayOk ? "다른 앱 위에 표시 허용됨" : "다른 앱 위에 표시 필요",
     ];
     if (caps.fsiSupported) {
       permParts.push(fsiOk ? "잠금 화면 허용됨" : "잠금 화면 필요");
