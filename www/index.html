@@ -6,14 +6,14 @@
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#ffffff" />
   <title>나야나야</title>
-  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev59" />
-  <link rel="stylesheet" href="app.css?v=rev59" />
+  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev60" />
+  <link rel="stylesheet" href="app.css?v=rev60" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar" id="topbar">
       <div class="topbar-brand">
-        <img src="img/naya-logo.png?v=rev59" alt="" class="brand-logo" />
+        <img src="img/naya-logo.png?v=rev60" alt="" class="brand-logo" />
         <span class="brand-wordmark">
           <b>나야<span>나야</span></b>
           <small>중요한 알림만 크게</small>
@@ -75,13 +75,13 @@
           <div class="home-hero" id="homeHero">
             <div class="home-hero-track" id="homeHeroTrack">
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero.png?v=rev59" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
+                <img class="home-hero-img" src="img/home-hero.png?v=rev60" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev59" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
+                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev60" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev59" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
+                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev60" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
               </div>
             </div>
             <div class="home-hero-dots" id="homeHeroDots" aria-hidden="true">
@@ -93,24 +93,24 @@
 
           <div class="hub-grid">
             <button type="button" class="hub-tile" data-sub="setup" id="tileSetup">
-              <img class="hub-img" src="img/naya-icon-setup.png?v=rev59" alt="" />
+              <img class="hub-img" src="img/naya-icon-setup.png?v=rev60" alt="" />
               <span class="hub-label">시작하기</span>
               <span class="hub-sub">권한·연결 점검</span>
             </button>
             <button type="button" class="hub-tile" data-sub="recent">
-              <img class="hub-img" src="img/naya-icon-recent.png?v=rev59" alt="" />
+              <img class="hub-img" src="img/naya-icon-recent.png?v=rev60" alt="" />
               <span class="hub-label">최근에서 등록</span>
               <span class="hub-sub">규칙 바로가기</span>
             </button>
             <button type="button" class="hub-tile" data-sub="notif-link">
-              <img class="hub-img" src="img/naya-icon-search.png?v=rev59" alt="" />
+              <img class="hub-img" src="img/naya-icon-search.png?v=rev60" alt="" />
               <span class="hub-label">찾아 연결</span>
               <span class="hub-sub">규칙 바로가기</span>
             </button>
-            <button type="button" class="hub-tile accent" data-goto="design">
-              <img class="hub-img" src="img/naya-icon-test.png?v=rev59" alt="" />
-              <span class="hub-label">테마·미리보기</span>
-              <span class="hub-sub">모양 고르고 화면 확인</span>
+            <button type="button" class="hub-tile accent" data-sub="habits" id="tileHabits">
+              <img class="hub-img" src="img/naya-icon-test.png?v=rev60" alt="" />
+              <span class="hub-label">할 일</span>
+              <span class="hub-sub" id="habitTileHint">오늘 목록</span>
             </button>
           </div>
         </section>
@@ -450,6 +450,60 @@
           <p id="logBox" class="log muted-log">이벤트 없음</p>
         </section>
 
+        <section class="subpage scroll" id="sub-habits" data-sub="habits">
+          <div class="habit-tabs" role="tablist">
+            <button type="button" class="habit-tab on" data-habit-tab="today" id="habitTabToday">오늘</button>
+            <button type="button" class="habit-tab" data-habit-tab="later" id="habitTabLater">예정</button>
+          </div>
+          <p class="sub-lead" id="habitLead">안 하면 설정한 시각에 나야가 깨웁니다.</p>
+          <div id="habitList" class="habit-list"></div>
+          <button type="button" class="btn primary block" id="btnHabitAdd">할 일 추가</button>
+          <p class="habit-widget-help">
+            홈 화면을 길게 눌러 위젯 → <strong>나야나야</strong>를 붙이면 앱을 열지 않고 오늘 할 일을 체크할 수 있습니다.
+            재알림 간격은 설정 → 알람 동작과 같습니다.
+          </p>
+          <p id="habitMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-habit-edit" data-sub="habit-edit">
+          <p class="sub-lead">매일은 같은 시각, 특정일은 그날 한 번, 정기일은 고른 요일만.</p>
+          <input type="hidden" id="habitEditId" />
+          <label class="field">
+            <span>이름</span>
+            <input type="text" id="habitTitle" class="text-input block" maxlength="40" placeholder="약 먹기" autocomplete="off" />
+          </label>
+          <p class="rule-setting-title">언제</p>
+          <div class="habit-kinds" id="habitKinds">
+            <button type="button" class="on" data-kind="daily">매일</button>
+            <button type="button" data-kind="once">특정일</button>
+            <button type="button" data-kind="week">정기일</button>
+          </div>
+          <label class="field" id="habitDateField" hidden>
+            <span>날짜</span>
+            <input type="date" id="habitDate" class="text-input block" />
+          </label>
+          <div class="field" id="habitWeekField" hidden>
+            <span class="field-label">요일</span>
+            <div class="habit-days" id="habitDays">
+              <button type="button" data-day="1">월</button>
+              <button type="button" data-day="2">화</button>
+              <button type="button" data-day="3">수</button>
+              <button type="button" data-day="4">목</button>
+              <button type="button" data-day="5">금</button>
+              <button type="button" data-day="6">토</button>
+              <button type="button" data-day="7">일</button>
+            </div>
+          </div>
+          <label class="field">
+            <span>시각</span>
+            <input type="time" id="habitTime" class="text-input block" value="21:00" />
+          </label>
+          <p class="habit-play-hint" id="habitPlayHint" hidden>Play에서는 이 시각이 대략입니다. 병원처럼 정확한 시각이면 조금 앞당겨 두세요.</p>
+          <button type="button" class="btn primary block" id="btnHabitSave">이 할 일로 저장</button>
+          <button type="button" class="btn ghost block" id="btnHabitDelete" hidden>삭제</button>
+          <p id="habitEditMsg" class="hint feedback"></p>
+        </section>
+
         <section class="subpage" id="sub-about" data-sub="about">
           <p id="versionLabel" class="about-version"></p>
           <p class="hint about-hint play-hide-update">삭제 없이 덮어쓰기 설치됩니다.</p>
@@ -473,6 +527,7 @@
                 <ul class="bullets">
                   <li>사용자가 허용한 <strong>알림 접근</strong>으로, 선택한 앱의 알림 제목·본문을 기기에서 읽습니다.</li>
                   <li>필터용 키워드, 감시 앱·대상 목록, 알람 옵션과 사용자가 선택한 대상 프로필 사진은 기기 내부 저장소에만 보관됩니다.</li>
+                  <li>할 일 이름·시각은 기기 안에서만 저장되며 서버로 보내지 않습니다.</li>
                   <li>계정·로그인·클라우드 동기화 기능은 없습니다.</li>
                 </ul>
               </section>
@@ -580,6 +635,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev59"></script>
+  <script src="app.js?v=rev60"></script>
 </body>
 </html>
