@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 60;
+  const WEB_UI_REVISION = 62;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1976,7 +1976,7 @@
     if ($("habitLead")) {
       $("habitLead").textContent = habitTab === "later"
         ? "내일 이후는 위젯에 올리지 않습니다."
-        : "안 하면 설정한 시각에 나야가 깨웁니다. 특정일은 자정이 지나도 남습니다.";
+        : "안 하면 설정한 시각에 나야가 깨웁니다. 특정일은 자정이 지나도 남습니다. 위젯은 왼쪽 네모로 완료하세요.";
     }
     if (!list.length) {
       box.innerHTML = `<p class="habit-empty">${habitTab === "later" ? "예정된 할 일이 없습니다" : "오늘 할 일이 없습니다"}</p>`;
@@ -1984,7 +1984,16 @@
     }
     box.innerHTML = list.map((h) => {
       const done = habitDone(h, day);
-      const overdue = h.kind === "once" && h.date && h.date < day && !h.completedOnce;
+      const overdue = !done && (
+        (h.kind === "once" && h.date && h.date < day && !h.completedOnce) ||
+        (() => {
+          const now = new Date();
+          const hm = now.getHours() * 60 + now.getMinutes();
+          const due = (Number(h.hour) || 0) * 60 + (Number(h.minute) || 0);
+          if (h.kind === "once" && h.date && h.date > day) return false;
+          return hm >= due;
+        })()
+      );
       const tag = habitTag(h);
       return `<div class="habit-row${done ? " done" : ""}${overdue ? " overdue" : ""}" data-id="${h.id}">
         <button type="button" class="habit-chk" data-toggle="${h.id}" aria-label="완료">${done ? "✓" : ""}</button>
@@ -2002,7 +2011,7 @@
     if (dateField) dateField.hidden = habitKind !== "once";
     if (weekField) weekField.hidden = habitKind !== "week";
     const playHint = $("habitPlayHint");
-    if (playHint) playHint.hidden = !(caps.distribution === "play" && !caps.exactAlarmEnabled && habitKind === "once");
+    if (playHint) playHint.hidden = !(caps.distribution === "play" && !caps.exactAlarmEnabled);
     document.querySelectorAll("#habitDays button").forEach((b) => {
       b.classList.toggle("on", habitWeekdays.includes(Number(b.dataset.day)));
     });
