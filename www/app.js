@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 59;
+  const WEB_UI_REVISION = 60;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -240,6 +240,8 @@
     test: "테스트",
     about: "앱 정보",
     privacy: "개인정보처리방침",
+    habits: "할 일",
+    "habit-edit": "할 일 추가",
   };
 
   function ensureSubpageHeaders() {
@@ -336,6 +338,11 @@
         }
         if (sub === "rule-alert") renderRuleAlertEditor();
         if (sub === "app-add") loadInstalledApps();
+        if (sub === "habits") renderHabits();
+        if (sub === "habit-edit") {
+          if (!$("habitEditId")?.value) resetHabitForm();
+          syncHabitKindUi();
+        }
         if (sub === "notif-link") {
           renderLinkAppPicker(cachedAppPresets);
           if (!$("notifLinkResults")?.children?.length) {
@@ -1877,6 +1884,226 @@
     });
   }
 
+  const HABIT_LS = "naya_habits_v1";
+  let habitTab = "today";
+  let habitKind = "daily";
+  let habitWeekdays = [];
+
+  function todayStamp() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+  function isoWeekdayJs() {
+    const d = new Date().getDay();
+    return d === 0 ? 7 : d;
+  }
+  function readLocalHabits() {
+    return parseJson(localStorage.getItem(HABIT_LS) || "[]", []) || [];
+  }
+  function writeLocalHabits(items) {
+    localStorage.setItem(HABIT_LS, JSON.stringify(items));
+  }
+  function allHabits(fromStatus) {
+    if (Array.isArray(fromStatus)) return fromStatus;
+    const nativeList = parseJson(call("listHabits"), null);
+    if (nativeList && Array.isArray(nativeList.items)) return nativeList.items;
+    return readLocalHabits();
+  }
+  function habitDone(h, day) {
+    if (h.kind === "once") return !!h.completedOnce;
+    return (h.lastCompletedOn || "") === (day || todayStamp());
+  }
+  function habitOnToday(h, day, weekday) {
+    if (h.enabled === false) return false;
+    if (h.kind === "once" && h.completedOnce) return false;
+    if (h.kind === "daily") return true;
+    if (h.kind === "week") return (h.weekdays || []).map(Number).includes(weekday);
+    if (h.kind === "once") return h.date && h.date <= day;
+    return false;
+  }
+  function habitTag(h) {
+    if (h.kind === "daily") return { text: "매일", cls: "daily" };
+    if (h.kind === "week") {
+      const names = ["", "월", "화", "수", "목", "금", "토", "일"];
+      const days = (h.weekdays || []).map((d) => names[d] || "").join("");
+      return { text: days ? `매주 ${days}` : "매주", cls: "week" };
+    }
+    return { text: "오늘", cls: "once" };
+  }
+  function habitTimeLabel(h, day) {
+    const hm = `${String(h.hour).padStart(2, "0")}:${String(h.minute).padStart(2, "0")}`;
+    if (h.kind === "once" && h.date && h.date < day && !h.completedOnce) {
+      return `지남 ${String(h.date).slice(5).replace("-", "/")}`;
+    }
+    return hm;
+  }
+  function splitHabits(items) {
+    const day = todayStamp();
+    const weekday = isoWeekdayJs();
+    const today = items.filter((h) => habitOnToday(h, day, weekday)).sort((a, b) => {
+      const ad = habitDone(a, day) ? 1 : 0;
+      const bd = habitDone(b, day) ? 1 : 0;
+      if (ad !== bd) return ad - bd;
+      return a.hour * 60 + a.minute - (b.hour * 60 + b.minute);
+    });
+    const later = items.filter((h) => {
+      if (h.enabled === false || h.completedOnce) return false;
+      if (h.kind === "once") return h.date > day;
+      if (h.kind === "week") return !(h.weekdays || []).map(Number).includes(weekday);
+      return false;
+    });
+    return { today, later, remaining: today.filter((h) => !habitDone(h, day)).length };
+  }
+  function updateHabitTile(remaining, habits) {
+    const hint = $("habitTileHint");
+    if (!hint) return;
+    let left = remaining;
+    if (left == null) left = splitHabits(allHabits(habits)).remaining;
+    hint.textContent = left > 0 ? `오늘 ${left}건 남음` : "오늘 목록";
+  }
+  function renderHabits(fromStatus) {
+    const box = $("habitList");
+    if (!box) return;
+    const items = allHabits(fromStatus);
+    const { today, later } = splitHabits(items);
+    const day = todayStamp();
+    const list = habitTab === "later" ? later : today;
+    document.querySelectorAll(".habit-tab").forEach((b) => {
+      b.classList.toggle("on", b.dataset.habitTab === habitTab);
+    });
+    if ($("habitLead")) {
+      $("habitLead").textContent = habitTab === "later"
+        ? "내일 이후는 위젯에 올리지 않습니다."
+        : "안 하면 설정한 시각에 나야가 깨웁니다. 특정일은 자정이 지나도 남습니다.";
+    }
+    if (!list.length) {
+      box.innerHTML = `<p class="habit-empty">${habitTab === "later" ? "예정된 할 일이 없습니다" : "오늘 할 일이 없습니다"}</p>`;
+      return;
+    }
+    box.innerHTML = list.map((h) => {
+      const done = habitDone(h, day);
+      const overdue = h.kind === "once" && h.date && h.date < day && !h.completedOnce;
+      const tag = habitTag(h);
+      return `<div class="habit-row${done ? " done" : ""}${overdue ? " overdue" : ""}" data-id="${h.id}">
+        <button type="button" class="habit-chk" data-toggle="${h.id}" aria-label="완료">${done ? "✓" : ""}</button>
+        <span class="habit-meta" data-edit="${h.id}"><span class="habit-name">${h.title}</span><span class="habit-tag ${tag.cls}">${tag.text}</span></span>
+        <span class="habit-time">${habitTimeLabel(h, day)}</span>
+      </div>`;
+    }).join("");
+  }
+  function syncHabitKindUi() {
+    document.querySelectorAll("#habitKinds button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.kind === habitKind);
+    });
+    const dateField = $("habitDateField");
+    const weekField = $("habitWeekField");
+    if (dateField) dateField.hidden = habitKind !== "once";
+    if (weekField) weekField.hidden = habitKind !== "week";
+    const playHint = $("habitPlayHint");
+    if (playHint) playHint.hidden = !(caps.distribution === "play" && !caps.exactAlarmEnabled && habitKind === "once");
+    document.querySelectorAll("#habitDays button").forEach((b) => {
+      b.classList.toggle("on", habitWeekdays.includes(Number(b.dataset.day)));
+    });
+    const id = $("habitEditId")?.value;
+    const titleEl = document.querySelector('#sub-habit-edit .subpage-title');
+    if (titleEl) titleEl.textContent = id ? "할 일 수정" : "할 일 추가";
+  }
+  function resetHabitForm() {
+    if ($("habitEditId")) $("habitEditId").value = "";
+    if ($("habitTitle")) $("habitTitle").value = "";
+    if ($("habitTime")) $("habitTime").value = "21:00";
+    if ($("habitDate")) $("habitDate").value = todayStamp();
+    habitKind = "daily";
+    habitWeekdays = [];
+    if ($("btnHabitDelete")) $("btnHabitDelete").hidden = true;
+    syncHabitKindUi();
+  }
+  function fillHabitForm(h) {
+    if ($("habitEditId")) $("habitEditId").value = h.id || "";
+    if ($("habitTitle")) $("habitTitle").value = h.title || "";
+    if ($("habitTime")) {
+      $("habitTime").value = `${String(h.hour ?? 21).padStart(2, "0")}:${String(h.minute ?? 0).padStart(2, "0")}`;
+    }
+    if ($("habitDate")) $("habitDate").value = h.date || todayStamp();
+    habitKind = h.kind || "daily";
+    habitWeekdays = (h.weekdays || []).map(Number);
+    if ($("btnHabitDelete")) $("btnHabitDelete").hidden = !h.id;
+    syncHabitKindUi();
+  }
+  function saveHabitFromForm() {
+    const title = ($("habitTitle")?.value || "").trim();
+    if (!title) {
+      toast("이름을 적어 주세요", "habitEditMsg");
+      return;
+    }
+    const time = ($("habitTime")?.value || "21:00").split(":");
+    const hour = Number(time[0] || 21);
+    const minute = Number(time[1] || 0);
+    if (habitKind === "week" && !habitWeekdays.length) {
+      toast("요일을 하나 이상 고르세요", "habitEditMsg");
+      return;
+    }
+    if (habitKind === "once" && !($("habitDate")?.value)) {
+      toast("날짜를 고르세요", "habitEditMsg");
+      return;
+    }
+    const payload = {
+      id: $("habitEditId")?.value || `h-${Date.now()}`,
+      title,
+      kind: habitKind,
+      hour,
+      minute,
+      date: habitKind === "once" ? $("habitDate").value : "",
+      weekdays: habitKind === "week" ? habitWeekdays : [],
+      enabled: true,
+    };
+    const nativeSave = parseJson(call("saveHabit", JSON.stringify(payload)), null);
+    if (nativeSave && nativeSave.ok === false) {
+      toast(nativeSave.message || "저장하지 못했습니다", "habitEditMsg");
+      return;
+    }
+    if (!nativeSave) {
+      const items = readLocalHabits();
+      const i = items.findIndex((x) => x.id === payload.id);
+      if (i >= 0) items[i] = { ...items[i], ...payload };
+      else items.unshift(payload);
+      writeLocalHabits(items);
+    }
+    toast("저장했습니다", "habitMsg");
+    goBack();
+    renderHabits();
+    updateHabitTile();
+  }
+  function deleteHabitFromForm() {
+    const id = $("habitEditId")?.value;
+    if (!id) return;
+    const nativeDel = parseJson(call("deleteHabit", id), null);
+    if (!nativeDel) {
+      writeLocalHabits(readLocalHabits().filter((x) => x.id !== id));
+    }
+    goBack();
+    renderHabits();
+    updateHabitTile();
+  }
+  function toggleHabit(id) {
+    const nativeToggle = parseJson(call("toggleHabitDone", id), null);
+    if (!nativeToggle) {
+      const items = readLocalHabits();
+      const i = items.findIndex((x) => x.id === id);
+      if (i >= 0) {
+        const day = todayStamp();
+        const h = items[i];
+        if (h.kind === "once") h.completedOnce = !h.completedOnce;
+        else h.lastCompletedOn = h.lastCompletedOn === day ? "" : day;
+        writeLocalHabits(items);
+      }
+    }
+    renderHabits();
+    updateHabitTile();
+  }
+
   function fillStatus(st) {
     if (!st) return;
     caps = {
@@ -1960,6 +2187,13 @@
       $("notifLinkHint").textContent = cachedAppPresets.filter((app) => app.enabled).length
         ? "스캔·검색"
         : "앱 선택 필요";
+    }
+    updateHabitTile(st.habitRemainingToday, st.habits);
+    if (currentSub === "habits") renderHabits(st.habits);
+    if (st.pendingOpenSub && typeof native?.consumeOpenSub === "function") {
+      const sub = st.pendingOpenSub;
+      call("consumeOpenSub");
+      if (sub && currentSub !== sub) openSubpage(sub);
     }
   }
 
@@ -2084,6 +2318,48 @@
     const parsed = parseJson(result, { ok: false });
     toast(parsed.message || "저장되었습니다", "saveMsg");
     refresh();
+  });
+  $("btnHabitAdd")?.addEventListener("click", () => {
+    resetHabitForm();
+    openSubpage("habit-edit");
+  });
+  $("btnHabitSave")?.addEventListener("click", saveHabitFromForm);
+  $("btnHabitDelete")?.addEventListener("click", deleteHabitFromForm);
+  $("habitList")?.addEventListener("click", (e) => {
+    const toggle = e.target.closest("[data-toggle]");
+    if (toggle) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleHabit(toggle.getAttribute("data-toggle"));
+      return;
+    }
+    const edit = e.target.closest("[data-edit], .habit-row");
+    const id = edit?.getAttribute("data-edit") || edit?.getAttribute("data-id");
+    if (!id) return;
+    const item = allHabits().find((h) => h.id === id);
+    if (item) fillHabitForm(item);
+    else resetHabitForm();
+    openSubpage("habit-edit");
+  });
+  $("habitKinds")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-kind]");
+    if (!btn) return;
+    habitKind = btn.dataset.kind;
+    syncHabitKindUi();
+  });
+  $("habitDays")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-day]");
+    if (!btn) return;
+    const day = Number(btn.dataset.day);
+    if (habitWeekdays.includes(day)) habitWeekdays = habitWeekdays.filter((d) => d !== day);
+    else habitWeekdays = [...habitWeekdays, day].sort();
+    syncHabitKindUi();
+  });
+  document.querySelectorAll(".habit-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      habitTab = btn.dataset.habitTab;
+      renderHabits();
+    });
   });
   $("btnSaveFilters")?.addEventListener("click", () => {
     const result = call("saveSettings", JSON.stringify(readFormSettings()));
