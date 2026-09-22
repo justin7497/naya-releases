@@ -6,14 +6,14 @@
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#ffffff" />
   <title>나야나야</title>
-  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev62" />
-  <link rel="stylesheet" href="app.css?v=rev62" />
+  <link rel="icon" type="image/png" href="img/naya-favicon.png?v=rev63" />
+  <link rel="stylesheet" href="app.css?v=rev63" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar" id="topbar">
       <div class="topbar-brand">
-        <img src="img/naya-logo.png?v=rev62" alt="" class="brand-logo" />
+        <img src="img/naya-logo.png?v=rev63" alt="" class="brand-logo" />
         <span class="brand-wordmark">
           <b>나야<span>나야</span></b>
           <small>중요한 알림만 크게</small>
@@ -75,13 +75,13 @@
           <div class="home-hero" id="homeHero">
             <div class="home-hero-track" id="homeHeroTrack">
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero.png?v=rev62" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
+                <img class="home-hero-img" src="img/home-hero.png?v=rev63" alt="진짜 중요한 연락은, 깨워줄게 — 지정한 알림만 끈질기게 증폭 알림" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev62" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
+                <img class="home-hero-img" src="img/home-hero-guide.png?v=rev63" alt="나야, 이렇게 쓰면 됩니다 — 중요 대상 지정, 크게 다시 알림, 앱 알림 감시·잠금화면 확인" />
               </div>
               <div class="home-hero-slide">
-                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev62" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
+                <img class="home-hero-img" src="img/home-hero-painpoints.png?v=rev63" alt="중요 알림을 절대 놓치지 마세요 — 묻히는 알림을 나야로 해결" />
               </div>
             </div>
             <div class="home-hero-dots" id="homeHeroDots" aria-hidden="true">
@@ -93,22 +93,22 @@
 
           <div class="hub-grid">
             <button type="button" class="hub-tile" data-sub="setup" id="tileSetup">
-              <img class="hub-img" src="img/naya-icon-setup.png?v=rev62" alt="" />
+              <img class="hub-img" src="img/naya-icon-setup.png?v=rev63" alt="" />
               <span class="hub-label">시작하기</span>
               <span class="hub-sub">권한·연결 점검</span>
             </button>
             <button type="button" class="hub-tile" data-sub="recent">
-              <img class="hub-img" src="img/naya-icon-recent.png?v=rev62" alt="" />
+              <img class="hub-img" src="img/naya-icon-recent.png?v=rev63" alt="" />
               <span class="hub-label">최근에서 등록</span>
               <span class="hub-sub">규칙 바로가기</span>
             </button>
             <button type="button" class="hub-tile" data-sub="notif-link">
-              <img class="hub-img" src="img/naya-icon-search.png?v=rev62" alt="" />
+              <img class="hub-img" src="img/naya-icon-search.png?v=rev63" alt="" />
               <span class="hub-label">찾아 연결</span>
               <span class="hub-sub">규칙 바로가기</span>
             </button>
             <button type="button" class="hub-tile accent" data-sub="habits" id="tileHabits">
-              <img class="hub-img" src="img/naya-icon-test.png?v=rev62" alt="" />
+              <img class="hub-img" src="img/naya-icon-test.png?v=rev63" alt="" />
               <span class="hub-label">할 일</span>
               <span class="hub-sub" id="habitTileHint">오늘 목록</span>
             </button>
@@ -176,7 +176,15 @@
               <span class="menu-ic mi-sliders"></span>
               <span class="menu-text">
                 <span class="menu-label">알람 동작</span>
-                <span class="menu-meta">조건·유지·재알림</span>
+                <span class="menu-meta">조건·유지·재알림·조용한 시간</span>
+              </span>
+              <span class="menu-chevron">›</span>
+            </button>
+            <button type="button" class="menu-item" data-sub="alarm-check">
+              <span class="menu-ic mi-shield"></span>
+              <span class="menu-text">
+                <span class="menu-label">알람이 안 울려요</span>
+                <span class="menu-meta">권한·테스트 점검</span>
               </span>
               <span class="menu-chevron">›</span>
             </button>
@@ -404,8 +412,76 @@
             <span id="snoozeLabel">재알림 간격 (분)</span>
             <input type="number" id="snoozeMinutes" min="0" max="60" />
           </label>
+          <div class="quiet-block">
+            <label class="setting-row">
+              <span class="setting-row-text">
+                <strong class="setting-row-title">조용한 시간</strong>
+                <span class="setting-row-desc">소리는 끄고, 화면 팝업만 띄웁니다</span>
+              </span>
+              <input type="checkbox" id="quietEnabled" class="setting-check" />
+            </label>
+            <div class="quiet-times" id="quietTimes">
+              <label class="field setting-field">
+                <span>시작</span>
+                <input type="time" id="quietStart" class="text-input block" value="23:00" />
+              </label>
+              <label class="field setting-field">
+                <span>끝</span>
+                <input type="time" id="quietEnd" class="text-input block" value="07:00" />
+              </label>
+            </div>
+            <p class="hint">자정을 넘겨도 됩니다. 중요한 연락·할 일은 화면으로만 알려 줍니다.</p>
+          </div>
           <button type="button" class="btn primary block" id="btnSave">저장</button>
           <p id="saveMsg" class="hint feedback"></p>
+        </section>
+
+        <section class="subpage scroll" id="sub-alarm-check" data-sub="alarm-check">
+          <p class="sub-lead">꺼진 항목만 켜 두면 팝업·할 일 알람이 안정적입니다. 권한 판정은 시작하기와 같습니다.</p>
+          <div class="perm-cards perm-cards-compact" id="alarmCheckCards">
+            <button type="button" class="perm-card" data-action="openOverlay" data-perm="overlay" id="alarmCheckOverlay">
+              <span class="perm-ic pic-layers"></span>
+              <span class="perm-body">
+                <strong>다른 앱 위에 표시</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state" id="alarmCheckOverlayState">—</span>
+            </button>
+            <button type="button" class="perm-card" data-action="openListener" data-perm="listener" id="alarmCheckListener">
+              <span class="perm-ic pic-bell"></span>
+              <span class="perm-body">
+                <strong>알림 접근</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state" id="alarmCheckListenerState">—</span>
+            </button>
+            <button type="button" class="perm-card play-hide-update" data-action="openFsi" data-perm="fsi" id="alarmCheckFsi">
+              <span class="perm-ic pic-lock"></span>
+              <span class="perm-body">
+                <strong>잠금화면 전체 알림</strong>
+                <span class="perm-go">설정 열기 ›</span>
+              </span>
+              <span class="perm-state" id="alarmCheckFsiState">—</span>
+            </button>
+            <button type="button" class="perm-card" data-action="openAppDetails" id="alarmCheckBattery">
+              <span class="perm-ic pic-layers"></span>
+              <span class="perm-body">
+                <strong>배터리·절전</strong>
+                <span class="perm-go">앱 정보에서 확인 ›</span>
+              </span>
+              <span class="perm-state">안내</span>
+            </button>
+          </div>
+          <p class="hint" id="alarmCheckHint">Play에서는 배터리 최적화를 앱이 강제로 끄지 않습니다. 앱 정보에서 절전 예외를 직접 확인하세요.</p>
+          <button type="button" class="btn primary block" data-action="testAlert">테스트로 한 번 울려보기</button>
+          <p class="hint">지금 테마 팝업이 한 번 뜹니다.</p>
+        </section>
+
+        <section class="subpage scroll" id="sub-device-sound" data-sub="device-sound">
+          <p class="sub-lead">휴대폰에 있는 알람음입니다. 기종마다 목록이 다를 수 있어요.</p>
+          <div id="deviceSoundList" class="sound-pick-grid" aria-label="기기 알람음"></div>
+          <button type="button" class="btn primary block" id="btnDeviceSoundUse">이 소리로 쓰기</button>
+          <p id="deviceSoundMsg" class="hint feedback"></p>
         </section>
 
         <section class="subpage" id="sub-permissions" data-sub="permissions" hidden aria-hidden="true">
@@ -456,6 +532,9 @@
             <button type="button" class="habit-tab" data-habit-tab="later" id="habitTabLater">예정</button>
           </div>
           <p class="sub-lead" id="habitLead">안 하면 설정한 시각에 나야가 깨웁니다.</p>
+          <div class="habit-quick" id="habitQuick">
+            <button type="button" class="habit-quick-chip" id="btnHabitWake">빠른 추가 · 기상</button>
+          </div>
           <div id="habitList" class="habit-list"></div>
           <button type="button" class="btn primary block" id="btnHabitAdd">할 일 추가</button>
           <p class="habit-widget-help">
@@ -499,6 +578,11 @@
             <span>시각</span>
             <input type="time" id="habitTime" class="text-input block" value="21:00" />
           </label>
+          <label class="field">
+            <span>소리</span>
+            <button type="button" class="text-input block habit-sound-btn" id="btnHabitSound">테마 기본음</button>
+          </label>
+          <input type="hidden" id="habitSoundId" value="" />
           <p class="habit-play-hint" id="habitPlayHint" hidden>Play에서는 알람 시각이 대략입니다. 병원·약처럼 놓치면 안 되는 일은 조금 앞당겨 두세요.</p>
           <button type="button" class="btn primary block" id="btnHabitSave">이 할 일로 저장</button>
           <button type="button" class="btn ghost block" id="btnHabitDelete" hidden>삭제</button>
@@ -636,6 +720,6 @@
   </div>
 
   <script src="privacy.js?v=play096"></script>
-  <script src="app.js?v=rev62"></script>
+  <script src="app.js?v=rev63"></script>
 </body>
 </html>
