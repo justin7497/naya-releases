@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 62;
+  const WEB_UI_REVISION = 63;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -236,6 +236,8 @@
     keywords: "키워드",
     "design-sound": "알림 소리",
     alarm: "알람 동작",
+    "alarm-check": "알람이 안 울려요",
+    "device-sound": "기기 알람음",
     permissions: "권한",
     test: "테스트",
     about: "앱 정보",
@@ -243,6 +245,10 @@
     habits: "할 일",
     "habit-edit": "할 일 추가",
   };
+
+  let deviceSoundTarget = "theme"; // theme | rule | habit
+  let deviceSoundPickedId = "";
+  let habitSoundId = "";
 
   function ensureSubpageHeaders() {
     document.querySelectorAll(".subpage[data-sub]").forEach((page) => {
@@ -332,6 +338,9 @@
         if (sub === "design-frame") renderFramePicker();
         if (sub === "design-font") renderFontPicker();
         if (sub === "design-sound") renderSoundPicker();
+        if (sub === "device-sound") renderDeviceSoundPicker();
+        if (sub === "alarm-check") renderAlarmCheck();
+        if (sub === "alarm") syncQuietUi();
         if (sub === "design-detail") {
           updateDesignLabels();
           updateDesignPreview();
@@ -723,10 +732,12 @@
     const grid = $("designSoundPickGrid");
     if (!grid) return;
     grid.innerHTML = "";
+    const themeId = designState.themeSound || "naya";
     (catalog().sounds || []).forEach((sound) => {
+      const selected = sound.id === themeId && !String(themeId).startsWith("device:");
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = `sound-pick${sound.id === designState.themeSound ? " is-selected" : ""}`;
+      btn.className = `sound-pick${selected ? " is-selected" : ""}`;
       btn.innerHTML = `
         <span class="sound-pick-icon" aria-hidden="true">♪</span>
         <span class="sound-pick-label">${escapeHtml(sound.label)}</span>
@@ -739,6 +750,19 @@
       });
       grid.appendChild(btn);
     });
+    const deviceSelected = String(themeId).startsWith("device:");
+    const deviceLabel = deviceSelected
+      ? (parseJson(call("soundLabel", themeId), {})?.label || "기기 알람음")
+      : "기기 알람음…";
+    const deviceBtn = document.createElement("button");
+    deviceBtn.type = "button";
+    deviceBtn.className = `sound-pick${deviceSelected ? " is-selected" : ""}`;
+    deviceBtn.innerHTML = `
+      <span class="sound-pick-icon" aria-hidden="true">☎</span>
+      <span class="sound-pick-label">${escapeHtml(deviceLabel)}</span>
+      <span class="sound-pick-preview">목록에서 고르기</span>`;
+    deviceBtn.addEventListener("click", () => openDeviceSoundPicker("theme"));
+    grid.appendChild(deviceBtn);
 
     const tts = $("tts");
     if (tts) {
@@ -750,6 +774,113 @@
           updateDesignLabels();
         });
       }
+    }
+  }
+
+  function openDeviceSoundPicker(target) {
+    deviceSoundTarget = target || "theme";
+    if (target === "theme") deviceSoundPickedId = String(designState.themeSound || "").startsWith("device:")
+      ? designState.themeSound
+      : "";
+    else if (target === "rule") deviceSoundPickedId = String(ruleEditState.soundId || "").startsWith("device:")
+      ? ruleEditState.soundId
+      : "";
+    else if (target === "habit") deviceSoundPickedId = String(habitSoundId || "").startsWith("device:")
+      ? habitSoundId
+      : "";
+    openSubpage("device-sound");
+  }
+
+  function renderDeviceSoundPicker() {
+    const list = $("deviceSoundList");
+    if (!list) return;
+    const data = parseJson(call("listDeviceAlarms"), { items: [], defaultId: "" });
+    const items = data.items || [];
+    if (!deviceSoundPickedId) deviceSoundPickedId = data.defaultId || (items[0] && items[0].id) || "";
+    list.innerHTML = "";
+    items.forEach((sound) => {
+      const selected = sound.id === deviceSoundPickedId;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `sound-pick${selected ? " is-selected" : ""}`;
+      btn.innerHTML = `
+        <span class="sound-pick-icon" aria-hidden="true">♪</span>
+        <span class="sound-pick-label">${escapeHtml(sound.label || "알람")}</span>
+        <span class="sound-pick-preview">미리듣기</span>`;
+      btn.addEventListener("click", () => {
+        deviceSoundPickedId = sound.id;
+        call("previewSound", sound.id);
+        renderDeviceSoundPicker();
+      });
+      list.appendChild(btn);
+    });
+  }
+
+  function applyDeviceSoundPick() {
+    const id = deviceSoundPickedId;
+    if (!id) {
+      toast("소리를 고르세요", "deviceSoundMsg");
+      return;
+    }
+    if (deviceSoundTarget === "theme") {
+      designState.themeSound = id;
+      call("previewSound", id);
+      goBack();
+      renderSoundPicker();
+      updateDesignLabels();
+    } else if (deviceSoundTarget === "rule") {
+      ruleEditState.soundId = id;
+      call("previewSound", id);
+      goBack();
+      renderRuleAlertEditor();
+    } else if (deviceSoundTarget === "habit") {
+      habitSoundId = id;
+      call("previewSound", id);
+      goBack();
+      syncHabitSoundUi();
+    }
+    toast("이 소리로 쓸게요", "deviceSoundMsg");
+  }
+
+  function minutesToTimeValue(mins) {
+    const m = Number(mins) || 0;
+    const h = Math.floor(((m % 1440) + 1440) % 1440 / 60);
+    const mm = ((m % 60) + 60) % 60;
+    return `${String(h).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+  }
+  function timeValueToMinutes(v) {
+    const parts = String(v || "00:00").split(":");
+    return (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+  }
+  function syncQuietUi() {
+    const on = !!$("quietEnabled")?.checked;
+    if ($("quietTimes")) $("quietTimes").style.opacity = on ? "1" : "0.45";
+  }
+  function renderAlarmCheck() {
+    const st = parseJson(call("getStatus"), {}) || {};
+    const caps = st;
+    const setState = (id, ok) => {
+      const el = $(id);
+      if (!el) return;
+      el.textContent = ok ? "ON" : "OFF";
+      el.classList.toggle("is-off", !ok);
+    };
+    setState("alarmCheckOverlayState", !!st.overlayGranted);
+    setState("alarmCheckListenerState", !!st.listenerGranted);
+    const fsiCard = $("alarmCheckFsi");
+    if (fsiCard) {
+      const showFsi = !!st.fsiSupported && caps.distribution !== "play";
+      fsiCard.hidden = !showFsi;
+      setState("alarmCheckFsiState", !!st.fsiGranted);
+    }
+    const hint = $("alarmCheckHint");
+    if (hint) {
+      const need = [];
+      if (!st.overlayGranted) need.push("다른 앱 위에 표시");
+      if (!st.listenerGranted) need.push("알림 접근");
+      hint.textContent = need.length
+        ? `필요: ${need.join(" · ")}. Play에서는 배터리 최적화를 앱이 강제로 끄지 않습니다.`
+        : "권한은 준비됐어요. 그래도 안 울리면 배터리·절전을 앱 정보에서 확인해 주세요.";
     }
   }
 
@@ -983,7 +1114,13 @@
   }
 
   function currentSoundLabel() {
-    return labelOf(catalog().sounds || [], designState.themeSound) || "나야나야";
+    return (() => {
+      const id = designState.themeSound;
+      if (String(id || "").startsWith("device:")) {
+        return parseJson(call("soundLabel", id), {})?.label || "기기 알람음";
+      }
+      return labelOf(catalog().sounds || [], id) || "나야나야";
+    })();
   }
 
   function openThemeGuideModal(set) {
@@ -1174,8 +1311,11 @@
     if ($("frameLabel")) $("frameLabel").textContent = labelOf(cat.frames, designState.themeFrame);
     if ($("fontLabel")) $("fontLabel").textContent = labelOf(cat.fonts, designState.themeFont);
     if ($("soundLabel")) {
-      const sound = labelOf(cat.sounds || [], designState.themeSound);
-      $("soundLabel").textContent = `${sound} · TTS ${designState.tts ? "켜짐" : "꺼짐"}`;
+      const id = designState.themeSound;
+      const sound = String(id || "").startsWith("device:")
+        ? (parseJson(call("soundLabel", id), {})?.label || "기기 알람음")
+        : labelOf(cat.sounds || [], id);
+      $("soundLabel").textContent = `${sound || "나야나야"} · TTS ${designState.tts ? "켜짐" : "꺼짐"}`;
     }
     if ($("designDetailSetLabel")) {
       const set = themeSets().find((s) => s.id === designState.themeSet);
@@ -1573,7 +1713,7 @@
       ...(catalog().sounds || []),
     ];
     sounds.forEach((sound) => {
-      const selected = sound.id === ruleEditState.soundId;
+      const selected = sound.id === ruleEditState.soundId && !String(ruleEditState.soundId || "").startsWith("device:");
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `sound-pick${selected ? " is-selected" : ""}`;
@@ -1590,6 +1730,19 @@
       });
       grid.appendChild(btn);
     });
+    const deviceSelected = String(ruleEditState.soundId || "").startsWith("device:");
+    const deviceLabel = deviceSelected
+      ? (parseJson(call("soundLabel", ruleEditState.soundId), {})?.label || "기기 알람음")
+      : "기기 알람음…";
+    const deviceBtn = document.createElement("button");
+    deviceBtn.type = "button";
+    deviceBtn.className = `sound-pick${deviceSelected ? " is-selected" : ""}`;
+    deviceBtn.innerHTML = `
+      <span class="sound-pick-icon" aria-hidden="true">☎</span>
+      <span class="sound-pick-label">${escapeHtml(deviceLabel)}</span>
+      <span class="sound-pick-preview">목록에서 고르기</span>`;
+    deviceBtn.addEventListener("click", () => openDeviceSoundPicker("rule"));
+    grid.appendChild(deviceBtn);
   }
 
   function isRuleDeleted(rule) {
@@ -1723,9 +1876,11 @@
       const card = document.createElement("div");
       card.className = "rule-card";
       const avatarDataUrl = ruleAvatarDataUrl(r);
-      const soundLabel = r.soundId
-        ? labelOf(catalog().sounds || [], r.soundId)
-        : "전역 사운드";
+      const soundLabel = !r.soundId
+        ? "전역 사운드"
+        : String(r.soundId).startsWith("device:")
+          ? (parseJson(call("soundLabel", r.soundId), {})?.label || "기기 알람음")
+          : (labelOf(catalog().sounds || [], r.soundId) || r.soundId);
       card.innerHTML = `
         <div class="rule-card-head">
           ${ruleAvatarHtml(r, avatarDataUrl)}
@@ -1778,6 +1933,9 @@
       flash: $("flash")?.checked ?? false,
       requireKeyword: $("requireKeyword")?.checked ?? false,
       snoozeMinutes: Number($("snoozeMinutes")?.value || 0),
+      quietEnabled: $("quietEnabled")?.checked ?? false,
+      quietStartMinutes: timeValueToMinutes($("quietStart")?.value || "23:00"),
+      quietEndMinutes: timeValueToMinutes($("quietEnd")?.value || "07:00"),
       keywords: $("keywords")?.value.trim() || "",
       watchedPackages: packages,
       ...designPayload(),
@@ -1793,6 +1951,10 @@
     if ($("flash")) $("flash").checked = !!s.flash;
     if ($("requireKeyword")) $("requireKeyword").checked = !!s.requireKeyword;
     if ($("snoozeMinutes")) $("snoozeMinutes").value = String(s.snoozeMinutes ?? 5);
+    if ($("quietEnabled")) $("quietEnabled").checked = !!s.quietEnabled;
+    if ($("quietStart")) $("quietStart").value = minutesToTimeValue(s.quietStartMinutes ?? 23 * 60);
+    if ($("quietEnd")) $("quietEnd").value = minutesToTimeValue(s.quietEndMinutes ?? 7 * 60);
+    syncQuietUi();
     if ($("keywords")) $("keywords").value = s.keywords || "";
     renderApps(s.appPresets || []);
     if (s.themeStyle) designState.themeStyle = s.themeStyle;
@@ -2019,6 +2181,59 @@
     const titleEl = document.querySelector('#sub-habit-edit .subpage-title');
     if (titleEl) titleEl.textContent = id ? "할 일 수정" : "할 일 추가";
   }
+  function syncHabitSoundUi() {
+    const btn = $("btnHabitSound");
+    const hidden = $("habitSoundId");
+    if (hidden) hidden.value = habitSoundId || "";
+    if (!btn) return;
+    if (!habitSoundId) {
+      btn.textContent = "테마 기본음";
+      return;
+    }
+    if (String(habitSoundId).startsWith("device:")) {
+      const label = parseJson(call("soundLabel", habitSoundId), {})?.label || "기기 알람음";
+      btn.textContent = label;
+      return;
+    }
+    const builtIn = (catalog().sounds || []).find((s) => s.id === habitSoundId);
+    btn.textContent = builtIn?.label || habitSoundId;
+  }
+
+  function openHabitSoundMenu() {
+    const sheet = document.createElement("div");
+    sheet.className = "habit-sound-sheet";
+    sheet.innerHTML = `
+      <button type="button" data-sound="">테마 기본음</button>
+      ${(catalog().sounds || []).map((s) => `<button type="button" data-sound="${escapeHtml(s.id)}">${escapeHtml(s.label)}</button>`).join("")}
+      <button type="button" data-sound="__device__">기기 알람음…</button>
+      <button type="button" data-sound="__cancel__">닫기</button>`;
+    const wrap = document.createElement("div");
+    wrap.className = "habit-sound-overlay";
+    wrap.appendChild(sheet);
+    wrap.addEventListener("click", (e) => {
+      if (e.target === wrap) wrap.remove();
+    });
+    sheet.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-sound]");
+      if (!b) return;
+      const v = b.getAttribute("data-sound");
+      if (v === "__cancel__") {
+        wrap.remove();
+        return;
+      }
+      if (v === "__device__") {
+        wrap.remove();
+        openDeviceSoundPicker("habit");
+        return;
+      }
+      habitSoundId = v || "";
+      if (habitSoundId) call("previewSound", habitSoundId);
+      syncHabitSoundUi();
+      wrap.remove();
+    });
+    document.body.appendChild(wrap);
+  }
+
   function resetHabitForm() {
     if ($("habitEditId")) $("habitEditId").value = "";
     if ($("habitTitle")) $("habitTitle").value = "";
@@ -2026,8 +2241,10 @@
     if ($("habitDate")) $("habitDate").value = todayStamp();
     habitKind = "daily";
     habitWeekdays = [];
+    habitSoundId = "";
     if ($("btnHabitDelete")) $("btnHabitDelete").hidden = true;
     syncHabitKindUi();
+    syncHabitSoundUi();
   }
   function fillHabitForm(h) {
     if ($("habitEditId")) $("habitEditId").value = h.id || "";
@@ -2038,8 +2255,10 @@
     if ($("habitDate")) $("habitDate").value = h.date || todayStamp();
     habitKind = h.kind || "daily";
     habitWeekdays = (h.weekdays || []).map(Number);
+    habitSoundId = h.soundId || "";
     if ($("btnHabitDelete")) $("btnHabitDelete").hidden = !h.id;
     syncHabitKindUi();
+    syncHabitSoundUi();
   }
   function saveHabitFromForm() {
     const title = ($("habitTitle")?.value || "").trim();
@@ -2067,6 +2286,7 @@
       date: habitKind === "once" ? $("habitDate").value : "",
       weekdays: habitKind === "week" ? habitWeekdays : [],
       enabled: true,
+      soundId: habitSoundId || "",
     };
     const nativeSave = parseJson(call("saveHabit", JSON.stringify(payload)), null);
     if (nativeSave && nativeSave.ok === false) {
@@ -2332,6 +2552,20 @@
     resetHabitForm();
     openSubpage("habit-edit");
   });
+  $("btnHabitWake")?.addEventListener("click", () => {
+    resetHabitForm();
+    if ($("habitTitle")) $("habitTitle").value = "기상";
+    if ($("habitTime")) $("habitTime").value = "07:00";
+    habitKind = "daily";
+    const def = parseJson(call("defaultDeviceAlarmSound"), {});
+    habitSoundId = def.id || "alarm";
+    syncHabitKindUi();
+    syncHabitSoundUi();
+    openSubpage("habit-edit");
+  });
+  $("btnHabitSound")?.addEventListener("click", openHabitSoundMenu);
+  $("btnDeviceSoundUse")?.addEventListener("click", applyDeviceSoundPick);
+  $("quietEnabled")?.addEventListener("change", syncQuietUi);
   $("btnHabitSave")?.addEventListener("click", saveHabitFromForm);
   $("btnHabitDelete")?.addEventListener("click", deleteHabitFromForm);
   $("habitList")?.addEventListener("click", (e) => {
@@ -2481,6 +2715,7 @@
         case "openListener": call("openListenerSettings"); break;
         case "openOverlay": call("openOverlaySettings"); break;
         case "openFsi": call("openFullScreenSettings"); break;
+        case "openAppDetails": call("openAppDetailsSettings"); break;
         case "checkUpdate": call("checkForUpdate"); break;
         case "reloadWebUi": {
           const rev = parseInt($("webUiBanner")?.dataset?.remoteRev || "0", 10);
@@ -2491,6 +2726,7 @@
         }
         case "testNormal":
         case "testCritical":
+        case "testAlert":
           call("saveSettings", JSON.stringify(designPayload()));
           call("testAlert", "normal");
           break;
