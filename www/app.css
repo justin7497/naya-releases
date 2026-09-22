@@ -3529,6 +3529,63 @@ a.tab { text-decoration: none; color: #98a2b3; }
   color: var(--muted);
   line-height: 1.5;
 }
+.habit-quick {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.habit-quick-chip {
+  border: 1px solid var(--line);
+  background: #fff7d6;
+  color: #191919;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.habit-sound-btn {
+  text-align: left;
+  cursor: pointer;
+  font-weight: 700;
+}
+.habit-sound-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+}
+.habit-sound-sheet {
+  width: min(100%, 420px);
+  background: #fff;
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.habit-sound-sheet button {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 14px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.habit-sound-sheet button:active { background: #f3f4f6; }
+.quiet-block { margin: 16px 0 8px; }
+.quiet-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.perm-state.is-off { color: #c2410c; font-weight: 800; }
 .habit-kinds {
   display: flex;
   gap: 6px;
