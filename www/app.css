@@ -320,7 +320,9 @@ html, body {
 .page.hub {
   flex-direction: column;
   gap: 12px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .page.hub.is-active {
   display: flex;
@@ -365,6 +367,18 @@ html, body {
   z-index: 1;
   animation: slideIn 0.2s ease;
   background: var(--bg);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.subpage.is-active > * {
+  flex-shrink: 0;
+}
+.subpage.privacy-sub.is-active {
+  overflow: hidden;
+}
+.subpage.privacy-sub.is-active > * {
+  flex-shrink: 1;
 }
 .subpage.scroll {
   overflow-x: hidden;
@@ -813,7 +827,7 @@ html, body {
   min-height: 0;
 }
 .menu-item {
-  flex: 1;
+  flex: 1 0 auto;
   min-height: 60px;
   display: grid;
   grid-template-columns: auto 1fr auto;
