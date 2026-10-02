@@ -3,7 +3,7 @@
   const $ = (id) => document.getElementById(id);
 
   /** 앱에 내장된 Web UI 번호. publishWebUi 시 서버에서 자동 증가 */
-  const WEB_UI_REVISION = 63;
+  const WEB_UI_REVISION = 66;
   const WEB_UI_REV_KEY = "naya_webui_applied_rev";
   const WEB_UI_DISMISS_KEY = "naya_webui_dismiss_rev";
   const REMOTE_WWW_FALLBACK = "https://justin7497.github.io/naya-releases/www";
@@ -1950,7 +1950,7 @@
     if ($("sticky")) $("sticky").checked = !!s.sticky;
     if ($("flash")) $("flash").checked = !!s.flash;
     if ($("requireKeyword")) $("requireKeyword").checked = !!s.requireKeyword;
-    if ($("snoozeMinutes")) $("snoozeMinutes").value = String(s.snoozeMinutes ?? 5);
+    if ($("snoozeMinutes")) $("snoozeMinutes").value = String(s.snoozeMinutes ?? 15);
     if ($("quietEnabled")) $("quietEnabled").checked = !!s.quietEnabled;
     if ($("quietStart")) $("quietStart").value = minutesToTimeValue(s.quietStartMinutes ?? 23 * 60);
     if ($("quietEnd")) $("quietEnd").value = minutesToTimeValue(s.quietEndMinutes ?? 7 * 60);
